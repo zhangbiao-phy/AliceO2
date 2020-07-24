@@ -8,8 +8,17 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
-add_subdirectory(base)
-add_subdirectory(simulation)
-add_subdirectory(macros)
-add_subdirectory(workflow)
-add_subdirectory(raw)
+o2_add_library(TRDRaw
+    SOURCES src/Cru2Tracklet.cxx
+            src/Cru2TrackletTask.cxx
+            src/CruRawReader.cxx
+               PUBLIC_LINK_LIBRARIES O2::TRDBase O2::Framework O2::Headers 
+                                     O2::DataFormatsTRD O2::DetectorsRaw
+	       )
+
+       o2_add_executable(cru2tracklet
+                  COMPONENT_NAME trd
+                  SOURCES src/Cru2Tracklet.cxx
+                  PUBLIC_LINK_LIBRARIES O2::TRDRaw
+		  )
+
