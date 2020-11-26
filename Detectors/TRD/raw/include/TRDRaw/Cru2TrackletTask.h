@@ -17,7 +17,7 @@
 
 #include "Framework/Task.h"
 #include "Framework/DataProcessorSpec.h"
-#include "TRDRaw/Cru2TrackletTranslator.h"
+#include "TRDRaw/CruRawReader.h"
 #include <fstream>
 
 using namespace o2::framework;
@@ -36,7 +36,8 @@ class Cru2TrackletTask : public Task
   void run(ProcessingContext& pc) final;
 
  private:
-  Cru2TrackletTranslator mTranslator;
+  CruRawReader mReader; // this will do the parsing, we still need the other side of the translator.
+// TrackletBlobWriter.
 };
 
 } // namespace trd
