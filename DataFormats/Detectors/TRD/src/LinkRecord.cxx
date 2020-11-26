@@ -24,6 +24,7 @@ uint32_t LinkRecord::getHalfChamberLinkId(uint32_t detector, uint32_t rob)
   int stack = (detector % constants::NLAYER);
   int layer = ((detector % (constants::NLAYER * constants::NSTACK)) / constants::NLAYER);
   int side = rob % 2;
+  std::cout << "sector, stack, layer, side :" << sector <<" " << stack << " " << layer << " " << side << std::endl;
   return LinkRecord::getHalfChamberLinkId(sector, stack, layer, side);
 }
 

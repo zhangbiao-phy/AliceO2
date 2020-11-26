@@ -8,12 +8,12 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-/// @file   Cru2TrackletTask.cxx
+/// @file   EpnRawReaderTask.cxx
 /// @author Sean Murray
 /// @brief  TRD cru output to tracklet task
 
-#include "TRDRaw/Cru2TrackletTask.h"
-#include "TRDRaw/Cru2TrackletTranslator.h"
+#include "TRDRaw/EpnRawReaderTask.h"
+#include "TRDRaw/CruRawReader.h"
 #include "Framework/ControlService.h"
 #include "Framework/ConfigParamRegistry.h"
 #include "Framework/RawDeviceService.h"
@@ -29,18 +29,18 @@ namespace o2
 namespace trd
 {
 
-void Cru2TrackletTask::init(InitContext& ic)
+void EpnRawReaderTask::init(InitContext& ic)
 {
   LOG(INFO) << "Cru2Tracklet Task init";
 
   auto finishFunction = [this]() {
-    mTranslator.checkSummary();
+    mReader.checkSummary();
   };
 
   ic.services().get<CallbackService>().set(CallbackService::Id::Stop, finishFunction);
 }
 
-void Cru2TrackletTask::run(ProcessingContext& pc)
+void EpnRawReaderTask::run(ProcessingContext& pc)
 {
   LOG(info) << "TRD Translator Task run";
 
@@ -66,11 +66,11 @@ void Cru2TrackletTask::run(ProcessingContext& pc)
       auto dataProcessingHeaderIn = DataRefUtils::getHeader<o2::framework::DataProcessingHeader*>(ref);
       auto payloadIn = ref.payload;
       auto payloadInSize = headerIn->payloadSize;
-      mTranslator.setDataBuffer(payloadIn);
-      mTranslator.setDataBufferSize(payloadInSize);
+      mReader.setDataBuffer(payloadIn);
+      mReader.setDataBufferSize(payloadInSize);
       /* run */
-      mTranslator.run();
-      auto payloadOutSize = 1; //mTranslator.getEncoderByteCounter();
+      mReader.run();
+      auto payloadOutSize = 1; //mReader.getEncoderByteCounter();
       auto payloadMessage = device->NewMessage(payloadOutSize);
       std::memcpy(payloadMessage->GetData(), bufferOut, payloadOutSize);
 

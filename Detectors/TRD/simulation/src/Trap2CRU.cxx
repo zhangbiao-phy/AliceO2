@@ -110,7 +110,6 @@ int Trap2CRU::sortByORI()
 {
   // data comes in sorted by padcolum, a row of 8 trap chips.
   // this is sadly not how the electronics is actually connected.
-  // we therefore need to resort the data according to the ORI link.
   // TODO consider unpacking an entire event into memory into a per ori vector, then dump it all out.
   // this is not for production running so the performance hit of sortin is probably ok ?? TODO ask someone to verify that.
   return 1;
@@ -201,6 +200,7 @@ void Trap2CRU::convertTrapData(o2::trd::TriggerRecord const& TrigRecord)
   //finished for event. this method is only called per event.
   int currentlinkrecord = 0;
   char* traprawdataptr = (char*)&mTrapRawData[0];
+  //TODO TODO TODO  need to resort or take care of half chamber id being in multiple places in the stream of linkrecords.
   for (int halfcru = 0; halfcru < NumberOfHalfCRU; halfcru++) {
     int supermodule = halfcru / 4;
     int endpoint = halfcru / 2;
@@ -233,7 +233,7 @@ void Trap2CRU::convertTrapData(o2::trd::TriggerRecord const& TrigRecord)
 
     int linkdatasize = 0; // in 32 bit words
     int link = halfcru / 2;
-    for (int halfcrulink = 0; halfcrulink < NLinksPerHalfCRU; halfcrulink++) {
+    for (int halfcrulink = 0; halfcrulink < NLinksPerHalfCRU; halfcrulink++) {//TODO needs to change relative to the triple todo 30 odd lines above.
       //links run from 0 to 14, so linkid offset is halfcru*15;
       int linkid = halfcrulink + halfcru * NLinksPerHalfCRU;
       LOG(debug) << "Currently checking for data on linkid : " << linkid << " from halfcru=" << halfcru << " and halfcrulink:" << halfcrulink << " ?? " << linkid << "==" << mLinkRecords[currentlinkrecord].getLinkId();

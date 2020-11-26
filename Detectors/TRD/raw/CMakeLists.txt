@@ -9,16 +9,17 @@
 # submit itself to any jurisdiction.
 
 o2_add_library(TRDRaw
-    SOURCES src/Cru2Tracklet.cxx
-            src/Cru2TrackletTask.cxx
+    SOURCES src/CruCompressor.cxx
+            src/CruCompressorTask.cxx
             src/CruRawReader.cxx
+            src/DigitsParser.cxx
                PUBLIC_LINK_LIBRARIES O2::TRDBase O2::Framework O2::Headers 
                                      O2::DataFormatsTRD O2::DetectorsRaw
 	       )
 
-       o2_add_executable(cru2tracklet
+       o2_add_executable(crucompressor
                   COMPONENT_NAME trd
-                  SOURCES src/Cru2Tracklet.cxx
+                  SOURCES src/CruCompressor.cxx
                   PUBLIC_LINK_LIBRARIES O2::TRDRaw
 		  )
 

@@ -13,7 +13,7 @@
 /// @brief  Basic DPL workflow for TRD CRU output(raw) to tracklet data.
 ///         There may or may not be some compression in this at some point.
 
-#include "TRDRaw/Cru2TrackletTask.h"
+#include "TRDRaw/CruCompressorTask.h"
 #include "Framework/WorkflowSpec.h"
 #include "Framework/ConfigParamSpec.h"
 #include "Framework/ConcreteDataMatcher.h"
@@ -26,9 +26,9 @@ using namespace o2::framework;
 // including Framework/runDataProcessing
 void customize(std::vector<ConfigParamSpec>& workflowOptions)
 {
-  auto config = ConfigParamSpec{"trd-cru2tracklet-config", VariantType::String, "A:TRD/RAWDATA", {"TRD raw data config"}};
-  auto outputDesc = ConfigParamSpec{"trd-cru2tracklet-output-desc", VariantType::String, "TRDTLT", {"Output specs description string"}};
-  auto verbosity = ConfigParamSpec{"trd-cru2tracklet-verbose", VariantType::Bool, false, {"Enable verbose compressor"}};
+  auto config = ConfigParamSpec{"trd-crucompressor-config", VariantType::String, "A:TRD/RAWDATA", {"TRD raw data config"}};
+  auto outputDesc = ConfigParamSpec{"trd-crucompressor-output-desc", VariantType::String, "TRDTLT", {"Output specs description string"}};
+  auto verbosity = ConfigParamSpec{"trd-crucompressor-verbose", VariantType::Bool, false, {"Enable verbose compressor"}};
 
   workflowOptions.push_back(config);
   workflowOptions.push_back(outputDesc);
@@ -41,13 +41,13 @@ void customize(std::vector<ConfigParamSpec>& workflowOptions)
 WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
 {
 
-  auto config = cfgc.options().get<std::string>("trd-cru2tracklet-config");
-  auto verbosity = cfgc.options().get<bool>("trd-cru2tracklet-verbose");
+  auto config = cfgc.options().get<std::string>("trd-crucompressor-config");
+  auto verbosity = cfgc.options().get<bool>("trd-crucompressor-verbose");
   std::vector<OutputSpec> outputs;
   outputs.emplace_back(OutputSpec(ConcreteDataTypeMatcher{"TRD", "TRDTLT"}));
 
   AlgorithmSpec algoSpec;
-  algoSpec = AlgorithmSpec{adaptFromTask<o2::trd::Cru2TrackletTask>()};
+  algoSpec = AlgorithmSpec{adaptFromTask<o2::trd::CruCompressorTask>()};
 
   WorkflowSpec workflow;
 
@@ -62,8 +62,8 @@ WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
      
      will lead to a workflow with 2 devices which will input match
      
-     trd-cru2tracklet-0 --> A:TRD/RAWDATA/768;B:TRD/RAWDATA/1024
-     trd-cru2tracklet-1 --> C:TRD/RAWDATA/1280;D:TRD/RAWDATA/1536
+     trd-crucompressor-0 --> A:TRD/RAWDATA/768;B:TRD/RAWDATA/1024
+     trd-crucompressor-1 --> C:TRD/RAWDATA/1280;D:TRD/RAWDATA/1536
      The number after the RAWDATA is the FeeID.
   */
 
@@ -76,12 +76,12 @@ WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
   while (getline(ssconfig, iconfig, ',')) { // for now we will keep the possibilty to have a device per half cru/feeid i.e. 6 per flp
                                             // this is probably never going to be used but would to nice to know hence here.
     workflow.emplace_back(DataProcessorSpec{
-      std::string("trd-cru2tracklet-") + std::to_string(idevice),
+      std::string("trd-crucompressor-") + std::to_string(idevice),
       select(iconfig.c_str()),
       outputs,
       algoSpec,
       Options{
-        {"trd-cru2tracklet-verbose", VariantType::Bool, false, {"verbose flag"}}}});
+        {"trd-crucompressor-verbose", VariantType::Bool, false, {"verbose flag"}}}});
     idevice++;
   }
 

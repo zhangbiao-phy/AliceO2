@@ -15,8 +15,8 @@
 //  associated headers and links etc. and produce the output of the cru.     //
 //  Hence the incredibly original name.                                      //
 //                                                                           //
-//  Some parts bare a striking resemblence to (at least when written)        //
-//  FIT/FTO/simulation/src/digit2raw.cxx                                     //
+//  Some parts bare a striking resemblence to (at least when initially       //
+//  written, to  FIT/FTO/simulation/src/digit2raw.cxx                        //
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "fairlogger/Logger.h"
@@ -118,7 +118,7 @@ void trap2raw(const std::string& inpName, const std::string& outDir, int verbosi
   wr.setSuperPageSize(superPageSizeInB);
   wr.useRDHVersion(rdhV);
   wr.setDontFillEmptyHBF(noEmptyHBF);
-
+  
   std::string outDirName(outDir);
   if (outDirName.back() != '/') {
     outDirName += '/';

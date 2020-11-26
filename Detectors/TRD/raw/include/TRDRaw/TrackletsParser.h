@@ -8,36 +8,33 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-/// @file   Cru2TrackletTask.h
+/// @file   TrackletsParser.h
 /// @author Sean Murray
 /// @brief  TRD cru output data to tracklet task
 
-#ifndef O2_TRD_CRU2TRACKLETTASK
-#define O2_TRD_CRU2TRACKLETTASK
+#ifndef O2_TRD_TRACKLETPARSER
+#define O2_TRD_TRACKLETPARSER
 
-#include "Framework/Task.h"
-#include "Framework/DataProcessorSpec.h"
-#include "TRDRaw/CruRawReader.h"
 #include <fstream>
-
-using namespace o2::framework;
+#include <vector>
 
 namespace o2
 {
 namespace trd
 {
 
-class Cru2TrackletTask : public Task
+class TrackletsParser 
 {
  public:
-  Cru2TrackletTask() = default;
-  ~Cru2TrackletTask() override = default;
-  void init(InitContext& ic) final;
-  void run(ProcessingContext& pc) final;
-
+  TrackletsParser() = default;
+  ~TrackletsParser() override = default;
+  void setData(std::vector<uint64_t> * data){mdata=data;}
+  int parseTracklets(std::vector<uint64_t> &tracklets);
  private:
-  CruRawReader mReader; // this will do the parsing, we still need the other side of the translator.
-// TrackletBlobWriter.
+  std::vector<uint64_t> *mdata;
+  int mdataparsed;   // count of data wordsin data that have been parsed in current call to parse.
+  int mtrackletsfound; // used for debugging.
+
 };
 
 } // namespace trd
