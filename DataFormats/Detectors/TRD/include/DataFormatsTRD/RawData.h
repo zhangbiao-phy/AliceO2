@@ -85,7 +85,7 @@ Word 7  |              reserved 5                       |             link 14 da
       uint64_t EndPoint : 4;       // bit 0..7 event type of the data. Trigger bits from TTC-PON message, distinguish physics from calibration events.
       uint64_t EventType : 4;      // bit 0..7 event type of the data. Trigger bits from TTC-PON message, distinguish physics from calibration events.
       uint64_t reserveda : 32;     //
-    } __attribute__((__packed__));
+    }__attribute__((__packed__));
   };
   union {
     uint64_t word12[2];
@@ -95,13 +95,13 @@ Word 7  |              reserved 5                       |             link 14 da
         uint8_t errorflag : 8;
       } __attribute__((__packed__)) errorflags[15];
       uint8_t reserved2 : 8;
-    } __attribute__((__packed__));
+    }__attribute__((__packed__));
   };
   union {
     uint64_t word3 = 0x0;
     struct {
       uint64_t reserved34;
-    } __attribute__((__packed__));
+    }__attribute__((__packed__));
   };
   union {
     uint64_t word47[4];
@@ -111,7 +111,7 @@ Word 7  |              reserved 5                       |             link 14 da
         uint64_t size : 16;
       } __attribute__((__packed__)) datasizes[15]; // although this is 8 dont use index 0 as its part of reserved.
       uint16_t reserved5;
-    } __attribute__((__packed__));
+    }__attribute__((__packed__));
   };
 };
 
@@ -145,7 +145,7 @@ struct TrackletHCHeader {
       //  1 DO NOT USE ! reserved for tracklet end marker disambiguation
       //  14 Tracklet test-pattern mode
       //  15 Reserved for testing
-    } __attribute__((__packed__));
+    }__attribute__((__packed__));
   };
 };
 
@@ -175,7 +175,7 @@ struct TrackletMCMHeader {
       uint32_t col : 2;    //  2 bits for position in pad direction.
       uint32_t padrow : 4; //  padrow,z coordinate for chip.
       uint32_t onea : 1;   //
-    } __attribute__((__packed__));
+    }__attribute__((__packed__));
   };
 };
 
@@ -190,7 +190,7 @@ struct TrackletMCMData {
       uint16_t slope : 6;   // Deflection angle of tracklet
       uint16_t pid : 15;    // Particle Identity
       uint16_t pos : 10;    // Position of tracklet, signed 10 bits, granularity 0.02 pad widths, -10.22 to +10.22, relative to centre of pad 10
-    } __attribute__((__packed__));
+    }__attribute__((__packed__));
   };
 };
 
@@ -214,9 +214,167 @@ struct TRDFeeID {
       uint8_t side : 1;        // the A=0 or C=1 side of the supermodule being readout
       uint8_t unused1 : 3;     // seperate so easier to read in hex dumps
       uint8_t supermodule : 8; // the supermodule being read out 0-17
-    } __attribute__((__packed__));
+    }__attribute__((__packed__));
   };
 };
+
+
+/// \structure DigitHCHeader 
+/// \brief Digit version of the TrackletHCHeader above, although contents are rather different.
+//  TODO come back and comment the fields or make the name more expressive, and fill in the jjjjjjj
+struct DigitHCHeader{
+//
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+  //             1zzzz  pppppppp        pppppppp1
+  union {//page 109 section 15.6.1 in tdp
+    uint32_t word0;
+    struct {
+        uint32_t res0 : 2;   
+        uint32_t side : 1;
+        uint32_t stack : 3;
+        uint32_t layer : 3;
+        uint32_t supermodule : 5;
+        uint32_t addHCW: 3;
+        uint32_t minor : 7;
+        uint32_t major : 7;
+        uint32_t version : 1;
+    }__attribute__((__packed__));
+  };
+
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+  //             1zzzz  pppppppp        pppppppp1
+  union {//page 109 section 15.6.2 in tdp
+    uint32_t word1;
+    struct {
+        uint32_t res1 : 2;    
+        uint32_t ptrigcount : 4; 
+        uint32_t ptrigphase : 4; 
+        uint32_t bunchcrossing : 16; 
+        uint32_t numtimebins : 6;   
+    }__attribute__((__packed__));
+  };
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+  union { //page 109 section 15.6.3 in tdp
+    uint32_t word2;
+    struct {
+        uint32_t res2 : 6;     
+        uint32_t dfilter : 6; 
+        uint32_t rfilter : 1;
+        uint32_t nlfilter : 1;
+        uint32_t xtfilter : 1;
+        uint32_t tfilter : 1; 
+        uint32_t gfilter : 1;
+        uint32_t pfilter : 6; 
+    }__attribute__((__packed__));
+  };
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+  union {//page 109 section 15.6.4 in tdp
+    uint32_t word3;
+    struct {
+        uint32_t res3 : 6; 
+        uint32_t svnrver : 13;    //readout program svn revision
+        uint32_t svnver  : 13;     //assember programm svn revision
+    }__attribute__((__packed__));
+  };
+};
+
+struct DigitMCMHeader{
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+  union {
+    uint32_t word;  //MCM header
+    struct {
+        uint32_t res4 : 4;        // reserve 1100
+        uint32_t eventcount : 20;
+        uint32_t mcm : 4;
+        uint32_t rob : 3;
+        uint32_t yearflag: 1;             //< oct2007 0,  else 1 
+    }__attribute__((__packed__));
+  };
+};
+
+//the odd numbering of 2 3 and 6 are taken from the TDP page 111 section 15.7.3 15.7.4 15.7.5
+struct trdTestPattern2{
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+  union {
+    uint32_t word; 
+    struct {
+        uint32_t eventcount : 6; // lower 6 bits of e counter.
+        uint32_t stack: 5;  
+        uint32_t layer : 3;  
+        uint32_t roc : 3;   
+        uint32_t rob: 3;  
+        uint32_t mcmTp2 : 4;
+        uint32_t cpu : 2;  
+        uint32_t counter : 6;
+    }__attribute__((__packed__));
+  };
+};
+struct trdTestPattern3{
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+  union {
+    uint32_t word;  
+    struct {
+        uint32_t eventcount: 12;  //lower 12 bits of ecounter
+        uint32_t stack: 5;  
+        uint32_t layer: 3;
+        uint32_t roc : 3;
+        uint32_t rob: 3;       
+        uint32_t mcm : 4;     
+        uint32_t cpu : 2;    
+      }__attribute__((__packed__));
+    };
+};
+struct trdTestPattern6{
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+  //             1zzzz  pppppppp        pppppppp1
+  union {
+    uint32_t word;  //HC header0
+      struct {
+        uint32_t eventcount;  // lower 4 bits of e counter.
+        uint32_t stack: 5;   // starting at 1
+        uint32_t layer: 3;  
+        uint32_t roc : 3; 
+        uint32_t rob : 3;      
+        uint32_t mcm : 4;       
+        uint32_t cpu : 2;        
+        uint32_t counter : 6;     
+        uint32_t oddadc : 2;       
+    }__attribute__((__packed__));
+  };
+};
+
+struct DigitMCMData {
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+  union {
+      uint32_t word0;
+      struct{
+        uint32_t a : 2;
+        uint32_t b: 5;
+        uint32_t adc : 21;       //pad plane
+      }__attribute__((__packed__));
+  };
+  union {
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+      uint32_t word1;
+      struct{
+        uint32_t c : 2; // c is wrong I cant remember name, but not a concern at the moment.
+        uint32_t z : 10;
+        uint32_t y : 10;
+        uint32_t x : 10;
+        }__attribute__((__packed__));
+  };
+};
+
 
 void buildTrackletHCHeader(TrackletHCHeader& header, int sector, int stack, int layer, int side, int chipclock, int format);
 void buildTrackletHCHeaderd(TrackletHCHeader& header, int detector, int rob, int chipclock, int format);
