@@ -8,12 +8,12 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-/// @file   EpnRawReaderTask.h
+/// @file   EpnDataReaderTask.h
 /// @author Sean Murray
-/// @brief  TRD cru output data to tracklet task
+/// @brief  TRD epn task to read incoming data 
 
-#ifndef O2_TRD_EPNRAWREADERTASK
-#define O2_TRD_EPNRAWREADERTASK
+#ifndef O2_TRD_EPNDATAREADERTASK
+#define O2_TRD_EPNDATAREADERTASK
 
 #include "Framework/Task.h"
 #include "Framework/DataProcessorSpec.h"
@@ -28,11 +28,11 @@ namespace o2
 namespace trd
 {
 
-class EpnRawReaderTask : public Task
+class EpnDataReaderTask : public Task
 {
  public:
-  EpnRawReaderTask() = default;
-  ~EpnRawReaderTask() override = default;
+  EpnDataReaderTask() = default;
+  ~EpnDataReaderTask() override = default;
   void init(InitContext& ic) final;
   void run(ProcessingContext& pc) final;
 

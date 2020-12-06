@@ -8,11 +8,11 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-/// @file   EpnRawReaderTask.cxx
+/// @file   EpnDataReaderTask.cxx
 /// @author Sean Murray
 /// @brief  TRD cru output to tracklet task
 
-#include "TRDRaw/EpnRawReaderTask.h"
+#include "TRDRaw/EpnDataReaderTask.h"
 #include "TRDRaw/CruRawReader.h"
 #include "Framework/ControlService.h"
 #include "Framework/ConfigParamRegistry.h"
@@ -29,7 +29,7 @@ namespace o2
 namespace trd
 {
 
-void EpnRawReaderTask::init(InitContext& ic)
+void EpnDataReaderTask::init(InitContext& ic)
 {
   LOG(INFO) << "Cru2Tracklet Task init";
 
@@ -40,7 +40,7 @@ void EpnRawReaderTask::init(InitContext& ic)
   ic.services().get<CallbackService>().set(CallbackService::Id::Stop, finishFunction);
 }
 
-void EpnRawReaderTask::run(ProcessingContext& pc)
+void EpnDataReaderTask::run(ProcessingContext& pc)
 {
   LOG(info) << "TRD Translator Task run";
 

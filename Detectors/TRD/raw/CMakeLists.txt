@@ -9,10 +9,14 @@
 # submit itself to any jurisdiction.
 
 o2_add_library(TRDRaw
-    SOURCES src/CruCompressor.cxx
+    SOURCES #src/CruCompressor.cxx
             src/CruCompressorTask.cxx
+            #src/EpnDataReader.cxx
+            src/EpnDataReaderTask.cxx
             src/CruRawReader.cxx
+            src/CompressedRawReader.cxx
             src/DigitsParser.cxx
+            src/TrackletsParser.cxx
                PUBLIC_LINK_LIBRARIES O2::TRDBase O2::Framework O2::Headers 
                                      O2::DataFormatsTRD O2::DetectorsRaw
 	       )
@@ -20,6 +24,12 @@ o2_add_library(TRDRaw
        o2_add_executable(crucompressor
                   COMPONENT_NAME trd
                   SOURCES src/CruCompressor.cxx
+                  PUBLIC_LINK_LIBRARIES O2::TRDRaw
+		  )
+
+      o2_add_executable(epndatareader
+                  COMPONENT_NAME trd
+                  SOURCES src/EpnDataReader.cxx
                   PUBLIC_LINK_LIBRARIES O2::TRDRaw
 		  )
 

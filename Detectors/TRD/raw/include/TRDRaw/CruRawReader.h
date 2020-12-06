@@ -101,6 +101,7 @@ class CruRawReader
   uint8_t mDataNextWordStep = 2;
   const o2::header::RDHAny* mDataRDH;
   HalfCRUHeader mCurrentHalfCRUHeader; // are we waiting for new header or currently parsing the payload of on
+  int mCurrentHalfCRULinkHeaderPoisition=0;
   uint16_t mCurrentLink;               // current link within the halfcru we are parsing 0-14
   uint16_t mCRUEndpoint;               // the upper or lower half of the currently parsed cru 0-14 or 15-29
   uint16_t mCRUID;

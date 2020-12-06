@@ -117,6 +117,7 @@ bool CruRawReader::processHalfCRU()
   /* process a FeeID/halfcru, 15 links */
   LOG(debug) << "--- PROCESS HalfCRU FeeID:" << mFEEID;
   mCurrentLinkDataPosition = 0;
+  mCurrentHalfCRULinkHeaderPoisition=0;
   if (mState == CRUStateHalfCRUHeader) {
     // well then read the halfcruheader.
     memcpy(&mCurrentHalfCRUHeader, (void*)(mDataPointer), sizeof(mCurrentHalfCRUHeader));

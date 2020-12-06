@@ -13,8 +13,8 @@
 /// @brief  Cru raw data reader, this is the part that parses the raw data
 //          it runs on the flp(pre compression) or on the epn(pre tracklet64 array generation) 
 
-#ifndef O2_TRD_CRURAWREADER
-#define O2_TRD_CRURAWREADER
+#ifndef O2_TRD_COMPRESSEDRAWREADER
+#define O2_TRD_COMPRESSEDRAWREADER
 
 #include <fstream>
 #include <string>
@@ -33,7 +33,7 @@ namespace trd
 {
 class TriggerRecord;
 
-class CruRawReader
+class CompressedRawReader
 {
 
   static constexpr bool debugparsing = true;
@@ -44,8 +44,8 @@ class CruRawReader
                  CRUStatePadding };
 
  public:
-  CruRawReader() = default;
-  ~CruRawReader() = default;
+  CompressedRawReader() = default;
+  ~CompressedRawReader() = default;
 
   inline bool run()
   {
@@ -65,7 +65,7 @@ class CruRawReader
     return false;
   };
 
-  void checkSummary();
+ void checkSummary();
   void resetCounters();
 
   void setDataBuffer(const char* val) { mDataBuffer = val; };

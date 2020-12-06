@@ -22,19 +22,25 @@ namespace o2
 {
 namespace trd
 {
+class Tracklet64;
 
 class TrackletsParser 
 {
  public:
   TrackletsParser() = default;
-  ~TrackletsParser() override = default;
-  void setData(std::vector<uint64_t> * data){mdata=data;}
-  int parseTracklets(std::vector<uint64_t> &tracklets);
- private:
-  std::vector<uint64_t> *mdata;
-  int mdataparsed;   // count of data wordsin data that have been parsed in current call to parse.
-  int mtrackletsfound; // used for debugging.
+  ~TrackletsParser() = default;
+  void setData(std::vector<uint64_t> * data){mData=data;}
+  int Parse();
+  int Parse(std::vector<uint64_t> *data){mData=data;return Parse();};
 
+  int getDataWordsParsed(){return mDataParsed;}
+  int getTrackletsFound(){return mTrackletsFound;}
+ private:
+  std::vector<uint64_t> *mData;
+  std::vector<Tracklet64> mTracklets;
+  int mDataParsed;   // count of data wordsin data that have been parsed in current call to parse.
+  int mTrackletsFound; // used for debugging.
+  
 };
 
 } // namespace trd
