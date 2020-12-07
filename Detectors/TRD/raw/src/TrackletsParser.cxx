@@ -44,7 +44,9 @@ int TrackletsParser::Parse()
       //
       //
       //
-      i
+  mCurrentLinkDataPosition = 0;
+  mCurrentHalfCRULinkHeaderPoisition=0;
+  mCurrentLink = 0;
 
   while (mDataPointer != mDataEndPointer && mCurrentLinkDataPosition < mTotalHalfCRUDataLength * 16) { // while we are stil in the rdh block and with in the current link
     LOG(debug) << "in while loop with state of :" << mState;
