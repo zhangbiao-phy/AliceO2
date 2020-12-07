@@ -52,27 +52,24 @@ uint32_t CruRawReader::processHBFs()
     mCRUID = o2::raw::RDHUtils::getCRUID(rdh);
     int packetCount = o2::raw::RDHUtils::getPacketCounter(rdh);
     LOG(debug) << "FEEID : " << mFEEID << " Packet: " << packetCount << " sizes : header" << headerSize << " memorysize:" << memorySize << " offsettonext:" << offsetToNext << " datapayload:" << dataPayload;
-    /* copy CRU payload to save buffer TODO again why the copy ??*/
-    //   std::memcpy(mSaveBuffer + mSaveBufferDataSize, (char*)(rdh) + headerSize, drmPayload);
-    //   mSaveBufferDataSize += drmPayload;
-    //
-    //   we will "simply" parse on the fly with a basic state machine.
+    //   we will parse on the fly with a basic state machine.
     LOGF(debug, "rdh ptr is %p\n", (void*)rdh);
     mDataPointer = (uint32_t*)((char*)rdh + headerSize);
     LOGF(debug, "mDataPointer is %p  ?= %p", (void*)mDataPointer, (void*)rdh);
     mDataEndPointer = (const uint32_t*)((char*)rdh + offsetToNext);
     LOGF(debug, "mDataEndPointer is %p\n ", (void*)mDataEndPointer);
-    while ((void*)mDataPointer < (void*)mDataEndPointer) { // loop to handle the case where a halfcru ends/begins mid rdh data block
+    while ((void*)mDataPointer < (void*)mDataEndPointer) { // loop to handle the case where a halfcru ends/begins within the rdh data block
       mEventCounter++;
-      if (processHalfCRU()) { // at this point the entire payload is in mSaveBuffer, TODO parse this incrementally, less mem foot print.
+      if (processHalfCRU()) { 
+          // process a halfcru 
+          // or continue with the remainder of an rdh o2 payload if we got to the end of cru 
+          // or continue with a new rdh payload if we are not finished with the last cru payload.
         LOG(warn) << "processHalfCRU return flase";
         break; // end of CRU
       }
       mState = CRUStateHalfChamber;
-      //buildCRUPayLoad(); // the rest of the hbf for the subsequent cruhalfchamber payload.
-      // TODO is this even possible if hbfs upto the stop  is for one event and each cru header is for 1 event?
     }
-    /* move to next RDH */
+    // move to next RDH
     rdh = (o2::header::RDHAny*)((char*)(rdh) + offsetToNext);
     LOG(debug) << " rdh is now at 0x" << (void*)rdh << " offset to next : " << offsetToNext;
   }
@@ -120,8 +117,9 @@ bool CruRawReader::processHalfCRU()
   mCurrentHalfCRULinkHeaderPoisition=0;
   if (mState == CRUStateHalfCRUHeader) {
     // well then read the halfcruheader.
-    memcpy(&mCurrentHalfCRUHeader, (void*)(mDataPointer), sizeof(mCurrentHalfCRUHeader));
+    memcpy(&mCurrentHalfCRUHeader, (void*)(mDataPointer), sizeof(mCurrentHalfCRUHeader)); //TODO remove the copy just use pointer dereferencing, doubt it will improve the speed much though.
     //mEncoderRDH = reinterpret_cast<o2::header::RDHAny*>(mEncoderPointer);)
+    mDataPointer += sizeof(mCurrentHalfCRUHeader);
     mCurrentLink = 0;
     o2::trd::getlinkdatasizes(mCurrentHalfCRUHeader, mCurrentHalfCRULinkLengths);
     o2::trd::getlinkerrorflags(mCurrentHalfCRUHeader, mCurrentHalfCRULinkErrorFlags);
@@ -129,111 +127,46 @@ bool CruRawReader::processHalfCRU()
                                               mCurrentHalfCRULinkLengths.end(),
                                               decltype(mCurrentHalfCRULinkLengths)::value_type(0));
     // we will always have at least a length of 1 fully padded for each link.
+    if(mTotalHalfCRUDataLength > mMaxCruBufferSize) {
+        LOG(fatal) << "Cru wont fit in the allocated buffer  " << mTotalHalfCRUDataLength << " > " << mMaxCruBufferSize;
+    }
     LOG(debug) << "Found  a HalfCRUHeader : ";
-    LOG(debug) << mCurrentHalfCRUHeader;
+    LOG(debug) << mCurrentHalfCRUHeader << " with payload total size of : " << mTotalHalfCRUDataLength;
     mState = CRUStateHalfChamber; // we expect a halfchamber header now
                                   //TODO maybe change name to something more generic, this is will have to change to handle other data types config/adcdata.
+    int rdhpayloadleft=mDataEndPointer - mDataPointer;
+    mCruPayloadRead=0;
+    //now sort out if we copy the remainderof the rdh payload or only a portion of it (tillthe end off the current halfcruheader's body
+    if(mTotalHalfCRUDataLength < rdhpayloadleft){
+        LOG(debug) << "read a halfcruheader at the top of the rdh payload, and it fits with in the rdh payload : " << mTotalHalfCRUDataLength << " < " << rdhpayloadleft;
+        LOG(debug) << "copying from " << mDataPointer << " to " << mDataPointer+mTotalHalfCRUDataLength;
+        memcpy(&mCruPayloadRead[0],(void*)(mDataPointer),sizeof(mTotalHalfCRUDataLength)); //0 as we have just read the header.
+        //advance pointer to next halfcruheader.
+        mDataPointer += mTotalHalfCRUDataLength; // this cru half chamber is contained with in the a single rdh payload.
+        mHalfCRUReadDataLength=mDataEndPointer-mDataPointer;
+        mState=CRUStateHalfCRUHeader; // now back on a halfcruheader with in the current rdh payload.
+    }
+    else{
+        //otherwise we copy til the end of the rdh payload, and place mDataPointeron the next rdh header.
+        memcpy(mDataPointer):
+        mHalfCRUReadDataLength=mDataEndPointer-mDataPointer;
+        mDataPointer = mDataEndPointer;
+    }
   }
-  while (mDataPointer != mDataEndPointer && mCurrentLinkDataPosition < mTotalHalfCRUDataLength * 16) { // while we are stil in the rdh block and with in the current link
-    LOG(debug) << "in while loop with state of :" << mState;
-      LOGF(debug, "mDataPointer: %p != mDataEndPointer: %p, mCurrentLinkDataPosition=%d != mTotalHalfCRUDataLenght=%d\n", (void*)mDataPointer, (void*)mDataPointer,mCurrentLinkDataPosition,mTotalHalfCRUDataLength*16);
-    if (mState == CRUStateHalfChamber) {
-      // read in the halfchamber header.
-      LOGF(debug, "mTrackletHCHeader is at %p had value 0x%08x", (void*)mDataPointer, mDataPointer[0]);
-      mTrackletHCHeader = (TrackletHCHeader*)mDataPointer;
-      mDataPointer += 16; //sizeof(mTrackletHCHeader)/4;
-      mHCID = getHCIDFromTrackletHCHeader(mTrackletHCHeader->word);
-      LOG(info)<< "HCID set to  : " << mHCID;
-      //     LOGF(info,"mDataPointer after advancing past TrackletHCHeader is at %p has value 0x%08x",(void*)mDataPointer,mDataPointer[0]);
-      //if(debugparsing){
-      //     printHalfChamber(*mTrackletHCHeader);
-      // }
-      mState = CRUStateTrackletMCMHeader; //now we expect a TrackletMCMHeader or some padding.
-    }
-    if (mState == CRUStateTrackletMCMHeader) {
-      LOGF(debug, "mTrackletMCMHeader is at %p had value 0x%08x", (void*)mDataPointer, mDataPointer[0]);
-      if (debugparsing) {
-        //           LOG(debug) << " state is : " << mState << " about to read TrackletMCMHeader";
+  else {
+      if(mState == CRUStateHalfChamber){
+        //we are still busy inside a halfcruchamber
+        //copy the remainder of the halfcruchamber or the entire rdh payload, which ever is smaller.
+        //mCurrentLinkDataPosition;
+        //mCurrentHalfCRULinkHeaderPosition;
+        
+        if()
       }
-      //read the header OR padding of 0xeeee;
-      if (mDataPointer[0] != 0xeeeeeeee) {
-        //we actually have an header word.
-        mTrackletHCHeader = (TrackletHCHeader*)mDataPointer;
-        LOG(debug) << "state mcmheader and word : 0x" << std::hex << mDataPointer[0];
-        mDataPointer++;
-        mCurrentLinkDataPosition++;
-        if (debugparsing) {
-          //       printTrackletMCMHeader(*mTrackletHCHeader);
-        }
-        mState = CRUStateTrackletMCMData;
-      } else { // this is the case of a first padding word for a "noncomplete" tracklet i.e. not all 3 tracklets.
-               //        LOG(debug) << "C";
-        mState = CRUStatePadding;
-        mDataPointer++;
-        mCurrentLinkDataPosition++;
-        TRDStatCounters.LinkPadWordCounts[mHCID]++; // keep track off all the padding words.
-        if (debugparsing) {
-          //       printTrackletMCMHeader(*mTrackletHCHeader);
-        }
+      else{
+          LOG(warn) << "huh unknown CRUstate of " << mState;
       }
-    }
-    if (mState == CRUStatePadding) {
-      LOGF(debug, "Padding is at %p had value 0x%08x", (void*)mDataPointer, mDataPointer[0]);
-      LOG(debug) << "state padding and word : 0x" << std::hex << mDataPointer[0];
-      if (mDataPointer[0] == 0xeeeeeeee) {
-        //another pointer with padding.
-        mDataPointer++;
-        mCurrentLinkDataPosition++;
-        TRDStatCounters.LinkPadWordCounts[mHCID]++; // keep track off all the padding words.
-        if (mDataPointer[0] & 0x1) {
-          //mcmheader
-          //        LOG(debug) << "changing state from padding to mcmheader as next datais 0x" << std::hex << mDataPointer[0];
-          mState = CRUStateTrackletMCMHeader;
-        } else if (mDataPointer[0] != 0xeeeeeeee) {
-          //        LOG(debug) << "changing statefrom padding to mcmdata as next datais 0x" << std::hex << mDataPointer[0];
-          mState = CRUStateTrackletMCMData;
-        }
-      } else {
-        LOG(debug) << "some went wrong we are in state padding, but not a pad word. 0x" << (void*)mDataPointer;
-      }
-    }
-    if (mState == CRUStateTrackletMCMData) {
-      LOGF(debug, "mTrackletMCMData is at %p had value 0x%08x", (void*)mDataPointer, mDataPointer[0]);
-      //tracklet data;
-      // build tracklet.
-      //for the case of on flp build a vector of tracklets, then pack them into a data stream with a header.
-      //for dpl build a vector and connect it with a triggerrecord.
-      mTrackletMCMData = (TrackletMCMData*)mDataPointer;
-      mDataPointer++;
-      mCurrentLinkDataPosition++;
-      if (mDataPointer[0] == 0xeeeeeeee) {
-        mState = CRUStatePadding;
-        //  LOG(debug) <<"changing to padding from mcmdata" ;
-      } else {
-        if (mDataPointer[0] & 0x1) {
-          mState = CRUStateTrackletMCMHeader; // we have more tracklet data;
-          LOG(debug) << "changing from MCMData to MCMHeader";
-        } else {
-          mState = CRUStateTrackletMCMData;
-          LOG(debug) << "continuing with mcmdata";
-        }
-      }
-      // Tracklet64 trackletsetQ0(o2::trd::getTrackletQ0());
-    }
-    //accounting ....
-    // mCurrentLinkDataPosition256++;
-    // mCurrentHalfCRUDataPosition256++;
-    // mTotalHalfCRUDataLength++;
-    LOG(debug) << mDataPointer << ":" << mDataEndPointer << " &&  " << mCurrentLinkDataPosition << " != " << mTotalHalfCRUDataLength * 16;
   }
-  //end of data so
-  /* init decoder */
-  mDataNextWord = 1;
-  mError = false;
-  mFatal = false;
-
-  /* check TRD Data Header */
-
+  
   LOG(debug) << "--- END PROCESS HalfCRU with state: " << mState;
 
   return true;
@@ -256,20 +189,6 @@ bool CruRawReader::checkerCheck()
   return false;
 }
 
-void CruRawReader::checkerCheckRDH()
-{
-  /* check orbit */
-  //   LOGF(info," --- Checking HalfCRU/RDH orbit: %08x/%08x \n", orbit, getOrbit(mDatardh));
-  //  if (orbit != mDatardh->orbit) {
-  //      LOGF(info," HalfCRU/RDH orbit mismatch: %08x/%08x \n", orbit, getOrbit(mDatardh));
-  //  }
-
-  /* check FEE id */
-  //   LOGF(info, " --- Checking CRU/RDH FEE id: %d/%d \n", mcruFeeID, getFEEID(mDatardh) & 0xffff);
-  //  if (mcruFeeID != (mDatardh->feeId & 0xFF)) {
-  //      LOGF(info, " HalfCRU/RDH FEE id mismatch: %d/%d \n", mcruFeeID, getFEEID(mDatardh) & 0xffff);
-  //  }
-}
 
 void CruRawReader::resetCounters()
 {

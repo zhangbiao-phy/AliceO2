@@ -52,7 +52,7 @@ WorkflowSpec defineDataProcessing(ConfigContext const& cfgc)
   WorkflowSpec workflow;
 
   /*
-   * This is replicated from TOF
+   * This is originaly replicated from TOF
      We define at run time the number of devices to be attached
      to the workflow and the input matching string of the device.
      This is is done with a configuration string like the following

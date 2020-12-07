@@ -18,11 +18,14 @@
 #include <fstream>
 #include <vector>
 
+#include "DataFormatsTRD/RawData.h"
+#include "DataFormatsTRD/Tracklet64.h"
+#include "DataFormatsTRD/TriggerRecord.h"
+
 namespace o2
 {
 namespace trd
 {
-class Tracklet64;
 
 class TrackletsParser 
 {
@@ -35,11 +38,18 @@ class TrackletsParser
 
   int getDataWordsParsed(){return mDataParsed;}
   int getTrackletsFound(){return mTrackletsFound;}
+  enum TrackletParserState { StateTrackletMCMHeader,
+                 StateTrackletMCMData,
+                 StatePadding };
+
  private:
   std::vector<uint64_t> *mData;
   std::vector<Tracklet64> mTracklets;
   int mDataParsed;   // count of data wordsin data that have been parsed in current call to parse.
   int mTrackletsFound; // used for debugging.
+  TrackletHCHeader* mTrackletHCHeader;
+  TrackletMCMHeader* mTrackletMCMHeader;
+  TrackletMCMData* mTrackletMCMData;
   
 };
 

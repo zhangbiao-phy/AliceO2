@@ -36,8 +36,8 @@ class CruCompressorTask : public Task
   void run(ProcessingContext& pc) final;
 
  private:
-  CruRawReader mReader; // this will do the parsing, we still need the other side of the translator.
-// TrackletBlobWriter.
+  CruRawReader mReader; // this will do the parsing.
+  // TrackletBlobWriter.
 };
 
 } // namespace trd
