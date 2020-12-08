@@ -57,7 +57,7 @@ class CruRawReader
       LOG(info) << " mDataBuffer :" << (void*)mDataBuffer;
       int datareadfromhbf = processHBFs();
       LOG(info) << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! end with " << datareadfromhbf;
-      LOG(info) << "mDataReadIn :"<< mDataReadIn << " mDataBufferSize:"<< mDataBufferSize;
+      LOG(info) << "mDataReadIn :" << mDataReadIn << " mDataBufferSize:" << mDataBufferSize;
     } while (mDataReadIn < mDataBufferSize);
 
     return false;
@@ -83,22 +83,26 @@ class CruRawReader
 
   /** decoder private functions and data members **/
 
-  inline void rewind() { LOG(debug) << "!!!rewinding"; mDataPointer = reinterpret_cast<const uint32_t*>(mDataBuffer); };
+  inline void rewind()
+  {
+    LOG(debug) << "!!!rewinding";
+    mDataPointer = reinterpret_cast<const uint32_t*>(mDataBuffer);
+  };
 
   int mJumpRDH = 0;
 
   std::ifstream mDecoderFile;
   const char* mDataBuffer = nullptr;
-  const uint32_t mMaxCRUBufferSize=1048576;
-  std::array<uint32_t,mMaxCRUBufferSize> mCRUPayLoad;//this holds a single cruhalfchamber link to pass to parsing.
-  uint32_t mHalfCRUPayLoadRead{0}; // the words current read in for the currnt cru payload.
-  int mCurrentHalfCRULinkHeaderPoisition=0;
+  const uint32_t mMaxCRUBufferSize = 1048576;
+  std::array<uint32_t, mMaxCRUBufferSize> mCRUPayLoad; //this holds a single cruhalfchamber link to pass to parsing.
+  uint32_t mHalfCRUPayLoadRead{0};                     // the words current read in for the currnt cru payload.
+  int mCurrentHalfCRULinkHeaderPoisition = 0;
   // no need to waste time doing the copy  std::array<uint32_t,8> mCurrentCRUWord; // data for a cru comes in words of 256 bits.
   uint32_t mCurrentLinkDataPosition256;    // count of data read for current link in units of 256 bits
   uint32_t mCurrentLinkDataPosition;       // count of data read for current link in units of 256 bits
   uint32_t mCurrentHalfCRUDataPosition256; //count of data read for this half cru.
   uint32_t mTotalHalfCRUDataLength;
-  
+
   long mDataBufferSize;
   uint64_t mDataReadIn = 0;
   const uint32_t* mDataPointer = nullptr; // pointer to the current position in the rdh
@@ -107,7 +111,7 @@ class CruRawReader
   const uint32_t* mDataPointerNext = nullptr;
   uint8_t mDataNextWord = 1;
   uint8_t mDataNextWordStep = 2;
- 
+
   const o2::header::RDHAny* mDataRDH;
   HalfCRUHeader mCurrentHalfCRUHeader; // are we waiting for new header or currently parsing the payload of on
   uint16_t mCurrentLink;               // current link within the halfcru we are parsing 0-14
@@ -138,7 +142,7 @@ class CruRawReader
   std::vector<Tracklet64> mEventTracklets; // when this runs properly it will only 6 for the flp its runnung on.
   std::vector<o2::trd::TriggerRecord> mEventStartPositions;
 
-  struct TRDDataCounters_t { //TODO this should go into a dpl message for catching by qc ?? I think.
+  struct TRDDataCounters_t {                      //TODO this should go into a dpl message for catching by qc ?? I think.
     std::array<uint32_t, 1080> LinkWordCounts;    //units of 256bits "cru word"
     std::array<uint32_t, 1080> LinkPadWordCounts; // units of 32 bits the data pad word size.
     std::array<uint32_t, 1080> LinkFreq;          //units of 256bits "cru word"

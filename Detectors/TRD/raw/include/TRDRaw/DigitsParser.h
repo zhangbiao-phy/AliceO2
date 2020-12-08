@@ -29,18 +29,23 @@ namespace trd
 {
 class Digit;
 
-class DigitsParser 
+class DigitsParser
 {
  public:
   DigitsParser() = default;
   ~DigitsParser() = default;
- uint32_t Parse(std::vector<uint64_t> *data){setData(data); return Parse();};
- uint32_t Parse();
- int setData(std::vector<uint64_t> *data){mData=data;};
+  uint32_t Parse(std::vector<uint64_t>* data)
+  {
+    setData(data);
+    return Parse();
+  };
+  uint32_t Parse();
+  int setData(std::vector<uint64_t>* data) { mData = data; };
+
  private:
-  std::vector<uint64_t>*mData=nullptr; // parsed in vector of raw data to parse.
-  std::vector<Digit> mDigits; // parsed in vector of raw data to parse.
-  int mParsedWords{0};         // words parsed in data vector, last complete bit is not parsed, and left for another round of data update.
+  std::vector<uint64_t>* mData = nullptr; // parsed in vector of raw data to parse.
+  std::vector<Digit> mDigits;             // parsed in vector of raw data to parse.
+  int mParsedWords{0};                    // words parsed in data vector, last complete bit is not parsed, and left for another round of data update.
 };
 
 } // namespace trd

@@ -31,23 +31,20 @@ namespace trd
 
 uint32_t DigitsParser::Parse()
 {
-  //we are handed the buffer payload of an rdh and need to parse its contents. 
+  //we are handed the buffer payload of an rdh and need to parse its contents.
   //producing a vector of digits.
   LOG(debug) << "Digits Parser parse ";
   //mData holds a buffer of <8kb (the o2 payload) parse placing digits in the output vector.
   //mData holds 2048 digits.
-  // due to the nature of the incoming data, there will *never* straggling digits or for that matter trap outputs spanning a boundary. 
-  
-  for(auto word : *mData){
-      //loop over all the words ... duh
-      //this is the payload sans the cruhalflinkheaders.
-      
+  // due to the nature of the incoming data, there will *never* straggling digits or for that matter trap outputs spanning a boundary.
+
+  for (auto word : *mData) {
+    //loop over all the words ... duh
+    //this is the payload sans the cruhalflinkheaders.
   }
 
-  
   return 1;
 }
-
 
 } // namespace trd
 } // namespace o2

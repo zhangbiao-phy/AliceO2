@@ -135,14 +135,14 @@ bool CompressedRawReader::processHalfCRU()
   }
   while (mDataPointer != mDataEndPointer && mCurrentLinkDataPosition < mTotalHalfCRUDataLength * 16) { // while we are stil in the rdh block and with in the current link
     LOG(debug) << "in while loop with state of :" << mState;
-      LOGF(debug, "mDataPointer: %p != mDataEndPointer: %p, mCurrentLinkDataPosition=%d != mTotalHalfCRUDataLenght=%d\n", (void*)mDataPointer, (void*)mDataPointer,mCurrentLinkDataPosition,mTotalHalfCRUDataLength*16);
+    LOGF(debug, "mDataPointer: %p != mDataEndPointer: %p, mCurrentLinkDataPosition=%d != mTotalHalfCRUDataLenght=%d\n", (void*)mDataPointer, (void*)mDataPointer, mCurrentLinkDataPosition, mTotalHalfCRUDataLength * 16);
     if (mState == CRUStateHalfChamber) {
       // read in the halfchamber header.
       LOGF(debug, "mTrackletHCHeader is at %p had value 0x%08x", (void*)mDataPointer, mDataPointer[0]);
       mTrackletHCHeader = (TrackletHCHeader*)mDataPointer;
       mDataPointer += 16; //sizeof(mTrackletHCHeader)/4;
       mHCID = getHCIDFromTrackletHCHeader(mTrackletHCHeader->word);
-      LOG(info)<< "HCID set to  : " << mHCID;
+      LOG(info) << "HCID set to  : " << mHCID;
       //     LOGF(info,"mDataPointer after advancing past TrackletHCHeader is at %p has value 0x%08x",(void*)mDataPointer,mDataPointer[0]);
       //if(debugparsing){
       //     printHalfChamber(*mTrackletHCHeader);

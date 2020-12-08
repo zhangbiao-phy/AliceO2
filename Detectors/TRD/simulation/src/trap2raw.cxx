@@ -118,7 +118,7 @@ void trap2raw(const std::string& inpName, const std::string& outDir, int verbosi
   wr.setSuperPageSize(superPageSizeInB);
   wr.useRDHVersion(rdhV);
   wr.setDontFillEmptyHBF(noEmptyHBF);
-  
+
   std::string outDirName(outDir);
   if (outDirName.back() != '/') {
     outDirName += '/';

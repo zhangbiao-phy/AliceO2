@@ -233,7 +233,7 @@ void Trap2CRU::convertTrapData(o2::trd::TriggerRecord const& TrigRecord)
 
     int linkdatasize = 0; // in 32 bit words
     int link = halfcru / 2;
-    for (int halfcrulink = 0; halfcrulink < NLinksPerHalfCRU; halfcrulink++) {//TODO needs to change relative to the triple todo 30 odd lines above.
+    for (int halfcrulink = 0; halfcrulink < NLinksPerHalfCRU; halfcrulink++) { //TODO needs to change relative to the triple todo 30 odd lines above.
       //links run from 0 to 14, so linkid offset is halfcru*15;
       int linkid = halfcrulink + halfcru * NLinksPerHalfCRU;
       LOG(debug) << "Currently checking for data on linkid : " << linkid << " from halfcru=" << halfcru << " and halfcrulink:" << halfcrulink << " ?? " << linkid << "==" << mLinkRecords[currentlinkrecord].getLinkId();

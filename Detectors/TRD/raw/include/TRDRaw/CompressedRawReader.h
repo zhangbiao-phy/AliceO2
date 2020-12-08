@@ -11,7 +11,7 @@
 /// @file   Cru2Tracklet.h
 /// @author Sean Murray
 /// @brief  Cru raw data reader, this is the part that parses the raw data
-//          it runs on the flp(pre compression) or on the epn(pre tracklet64 array generation) 
+//          it runs on the flp(pre compression) or on the epn(pre tracklet64 array generation)
 
 #ifndef O2_TRD_COMPRESSEDRAWREADER
 #define O2_TRD_COMPRESSEDRAWREADER
@@ -59,13 +59,13 @@ class CompressedRawReader
       LOG(info) << " mDataBuffer :" << (void*)mDataBuffer;
       int datareadfromhbf = processHBFs();
       LOG(info) << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! end with " << datareadfromhbf;
-      LOG(info) << "mDataReadIn :"<< mDataReadIn << " mDataBufferSize:"<< mDataBufferSize;
+      LOG(info) << "mDataReadIn :" << mDataReadIn << " mDataBufferSize:" << mDataBufferSize;
     } while (mDataReadIn < mDataBufferSize);
 
     return false;
   };
 
- void checkSummary();
+  void checkSummary();
   void resetCounters();
 
   void setDataBuffer(const char* val) { mDataBuffer = val; };
@@ -85,7 +85,11 @@ class CompressedRawReader
 
   /** decoder private functions and data members **/
 
-  inline void rewind() { LOG(debug) << "!!!rewinding"; mDataPointer = reinterpret_cast<const uint32_t*>(mDataBuffer); };
+  inline void rewind()
+  {
+    LOG(debug) << "!!!rewinding";
+    mDataPointer = reinterpret_cast<const uint32_t*>(mDataBuffer);
+  };
 
   int mJumpRDH = 0;
 

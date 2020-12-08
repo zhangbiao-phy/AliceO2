@@ -27,30 +27,33 @@ namespace o2
 namespace trd
 {
 
-class TrackletsParser 
+class TrackletsParser
 {
  public:
   TrackletsParser() = default;
   ~TrackletsParser() = default;
-  void setData(std::vector<uint64_t> * data){mData=data;}
+  void setData(std::vector<uint64_t>* data) { mData = data; }
   int Parse();
-  int Parse(std::vector<uint64_t> *data){mData=data;return Parse();};
+  int Parse(std::vector<uint64_t>* data)
+  {
+    mData = data;
+    return Parse();
+  };
 
-  int getDataWordsParsed(){return mDataParsed;}
-  int getTrackletsFound(){return mTrackletsFound;}
+  int getDataWordsParsed() { return mDataParsed; }
+  int getTrackletsFound() { return mTrackletsFound; }
   enum TrackletParserState { StateTrackletMCMHeader,
-                 StateTrackletMCMData,
-                 StatePadding };
+                             StateTrackletMCMData,
+                             StatePadding };
 
  private:
-  std::vector<uint64_t> *mData;
+  std::vector<uint64_t>* mData;
   std::vector<Tracklet64> mTracklets;
-  int mDataParsed;   // count of data wordsin data that have been parsed in current call to parse.
+  int mDataParsed;     // count of data wordsin data that have been parsed in current call to parse.
   int mTrackletsFound; // used for debugging.
   TrackletHCHeader* mTrackletHCHeader;
   TrackletMCMHeader* mTrackletMCMHeader;
   TrackletMCMData* mTrackletMCMData;
-  
 };
 
 } // namespace trd

@@ -10,7 +10,7 @@
 
 /// @file   EpnDataReaderTask.h
 /// @author Sean Murray
-/// @brief  TRD epn task to read incoming data 
+/// @brief  TRD epn task to read incoming data
 
 #ifndef O2_TRD_EPNDATAREADERTASK
 #define O2_TRD_EPNDATAREADERTASK
@@ -37,7 +37,7 @@ class EpnDataReaderTask : public Task
   void run(ProcessingContext& pc) final;
 
  private:
-  CruRawReader mReader; // this will do the parsing, of raw data passed directly through the flp(no compression)
+  CruRawReader mReader;                  // this will do the parsing, of raw data passed directly through the flp(no compression)
   CompressedRawReader mCompressedReader; //this will handle the incoming compressed data from the flp
 };
 

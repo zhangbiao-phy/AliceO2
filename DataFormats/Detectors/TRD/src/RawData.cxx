@@ -43,7 +43,7 @@ void buildTrackletHCHeaderd(TrackletHCHeader& header, int detector, int rob, int
 
 uint32_t getHCIDFromTrackletHCHeader(const TrackletHCHeader &header)
 {
-  return header.layer*2 + header.stack * constants::NLAYER*2 + header.supermodule * constants::NLAYER * constants::NSTACK*2 + header.side ;
+  return header.layer * 2 + header.stack * constants::NLAYER * 2 + header.supermodule * constants::NLAYER * constants::NSTACK * 2 + header.side;
 }
 
 // same method alternate input simpler to send a word pointer as const
@@ -51,7 +51,7 @@ uint32_t getHCIDFromTrackletHCHeader(const uint32_t &headerword)
 {
   TrackletHCHeader header;
   header.word =headerword;
-  return header.layer*2 + header.stack * constants::NLAYER*2 + header.supermodule * constants::NLAYER * constants::NSTACK*2+ header.side;
+  return header.layer * 2 + header.stack * constants::NLAYER * 2 + header.supermodule * constants::NLAYER * constants::NSTACK * 2 + header.side;
 }
 
 uint16_t buildTRDFeeID(int supermodule, int side, int endpoint)
