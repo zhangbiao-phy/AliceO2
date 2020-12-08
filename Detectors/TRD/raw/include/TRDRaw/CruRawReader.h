@@ -90,8 +90,8 @@ class CruRawReader
   std::ifstream mDecoderFile;
   const char* mDataBuffer = nullptr;
   const uint32_t mMaxCRUBufferSize=1048576;
-  std::array<uint32_t,mMaxCRUBufferSize> mCRUPayload;//this holds a single cruhalfchamber link to pass to parsing.
-  uint32_t mReadCRUPayload{0}; // the words current read in for the currnt cru payload.
+  std::array<uint32_t,mMaxCRUBufferSize> mCRUPayLoad;//this holds a single cruhalfchamber link to pass to parsing.
+  uint32_t mHalfCRUPayLoadRead{0}; // the words current read in for the currnt cru payload.
   int mCurrentHalfCRULinkHeaderPoisition=0;
   // no need to waste time doing the copy  std::array<uint32_t,8> mCurrentCRUWord; // data for a cru comes in words of 256 bits.
   uint32_t mCurrentLinkDataPosition256;    // count of data read for current link in units of 256 bits

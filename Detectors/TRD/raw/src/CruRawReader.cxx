@@ -134,21 +134,21 @@ bool CruRawReader::processHalfCRU()
     mState = CRUStateHalfChamber; // we expect a halfchamber header now
                                   //TODO maybe change name to something more generic, this is will have to change to handle other data types config/adcdata.
     int rdhpayloadleft=mDataEndPointer - mDataPointer;
-    mReadCruPayload=0;
+    mHalfCRUPayLoadRead=0;
     //now sort out if we copy the remainderof the rdh payload or only a portion of it (tillthe end off the current halfcruheader's body
     if(mTotalHalfCRUDataLength < rdhpayloadleft){
         LOG(debug) << "read a halfcruheader at the top of the rdh payload, and it fits with in the rdh payload : " << mTotalHalfCRUDataLength << " < " << rdhpayloadleft;
         LOG(debug) << "copying from " << mDataPointer << " to " << mDataPointer+mTotalHalfCRUDataLength;
-        memcpy(&mCruPayLoadRead[0],(void*)(mDataPointer),sizeof(mTotalHalfCRUDataLength)); //0 as we have just read the header.
+        memcpy(&mCRUPayLoad[0],(void*)(mDataPointer),sizeof(mTotalHalfCRUDataLength)); //0 as we have just read the header.
         //advance pointer to next halfcruheader.
         mDataPointer += mTotalHalfCRUDataLength; // this cru half chamber is contained with in the a single rdh payload.
-        mReadHalfCRUPayload=mDataEndPointer-mDataPointer;
+        mHalfCRUPayLoadRead=mDataEndPointer-mDataPointer;
         mState=CRUStateHalfCRUHeader; // now back on a halfcruheader with in the current rdh payload.
     }
     else{
         //otherwise we copy till the end of the rdh payload, and place mDataPointer on the next rdh header.
-        memcpy(&mCruPayloadRead[0],(void*)(mDataPointer),mDataEndPointer-mDataPointer); //0 as we have just read the header.
-        mReadHalfCRUDataLength=mDataEndPointer-mDataPointer;
+        memcpy(&mCRUPayLoad[0],(void*)(mDataPointer),mDataEndPointer-mDataPointer); //0 as we have just read the header.
+        mHalfCRUPayLoadRead=mDataEndPointer-mDataPointer;
         mDataPointer = mDataEndPointer;
         mState=CRUStateHalfChamber;
     }
@@ -161,25 +161,25 @@ bool CruRawReader::processHalfCRU()
         //mCurrentHalfCRULinkHeaderPosition;
         
         int remainderofrdhpayload=mDataEndPointer - mDataPointer;
-        int remainderofcrudatablock = mTotalHalfCRUDataLength-mReadHalfCRUPayLoad;
+        int remainderofcrudatablock = mTotalHalfCRUDataLength-mHalfCRUPayLoadRead;
         if(remainderofcrudatablock > remainderofrdhpayload){
             // the halfchamber block extends past the end of this rdh we are currently on.
             // copy the data from where we are to the end into the crupayload buffer.
             
-            int remainderofrdhpayload=mTotalHalfCRUDataLength-mReadHalfCRUDataLength;
-            LOG(debug) << "in state CRUStateHalfChamber with remainderofrdhpayload (" << remainderofrdhpayload << ") = " << mTotalHalfCRUDataLength << "-"<< mReadHalfCRUDataLength;
-            memcpy(&mCruPayloadRead[mReadHalfCRUDataLength],(void*)(mDataPointer),remainderofrdhpayload); //0 as we have just read the header.
+            int remainderofrdhpayload=mTotalHalfCRUDataLength-mHalfCRUPayLoadRead;
+            LOG(debug) << "in state CRUStateHalfChamber with remainderofrdhpayload (" << remainderofrdhpayload << ") = " << mTotalHalfCRUDataLength << "-"<< mHalfCRUPayLoadRead;
+            memcpy(&mCRUPayLoad[mHalfCRUPayLoadRead],(void*)(mDataPointer),remainderofrdhpayload); //0 as we have just read the header.
             mDataPointer = mDataEndPointer;
             mState=CRUStateHalfChamber;  // state stays the same, written here to be explicit.
         }
         else {
             // the current cru payload we are on finishes before the end of the current rdh block we are in.
-            int remainderofrdhpayloadthatwewant=mTotalHalfCRUDataLength-mReadHalfCRUDataLength;
+            int remainderofrdhpayloadthatwewant=mTotalHalfCRUDataLength-mHalfCRUPayLoadRead;
             //sanity check :
             if(remainderofrdhpayloadthatwewant < (mDataEndPointer-mDataPointer)){
                 LOG(warn) << " something odd we are supposed to have the cruhalfchamber ending with in the current rdh however : remainder of the rdh payload we want is : " << remainderofrdhpayloadthatwewant << " yet the rdh block only has " << mDataEndPointer - mDataPointer << " data left";
             }
-            memcpy(&mCruPayloadRead[mReadHalfCRUDataLength],(void*)(mDataPointer),remainderofrdhpayloadthatwewant); //0 as we have just read the header.
+            memcpy(&mCRUPayLoad[mHalfCRUPayLoadRead],(void*)(mDataPointer),remainderofrdhpayloadthatwewant); //0 as we have just read the header.
             mDataPointer+=remainderofrdhpayloadthatwewant;
             mState = CRUStateHalfCRUHeader;
         }
