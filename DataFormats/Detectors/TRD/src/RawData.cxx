@@ -228,5 +228,18 @@ std::ostream& operator<<(std::ostream& stream, const HalfCRUHeader& halfcru)
   return stream;
 }
 
+bool trackletMCMHeaderSanityCheck(const o2::trd::TrackletMCMHeader& header)
+{
+    // a bit limited to what we can check.
+  bool goodheader=true;
+  if(header.onea != 1) goodheader=false;
+  if(header.oneb != 1) goodheader=false;
+  // if we have 3rd tracklet (pid2!=0) then we must have all the others as well.
+  if((header.pid2 != 0) && (header.pid1 == 0 || header.pid0 == 0)) goodheader=false;
+  // sim for 2 tracklets.
+  if((header.pid1 != 0) && (header.pid0 == 0 )) goodheader=false;
+
+  return goodheader;
+}
 } // namespace trd
 } // namespace o2

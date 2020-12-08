@@ -23,9 +23,7 @@
 #include <vector>
 #include <array>
 
-namespace o2
-{
-namespace trd
+namespace o2::trd
 {
 
 int TrackletsParser::Parse()
@@ -36,114 +34,98 @@ int TrackletsParser::Parse()
   //mData holds a buffer of <8kb (the o2 payload) parse placing tracklets in the output vector.
   //mData holds 2048 digits.
   // due to the nature of the incoming data, there will *never* straggling digits or for that matter trap outputs spanning a boundary.
+  mCurrentLinkDataPosition = 0;
+  mCurrentLink = 0;
+  mBufferLocation=0;
+  int currentLinkStart=0;
+
   for (auto word : *mData) {
     //loop over all the words ... duh
     //this is the payload sans the cruhalflinkheaders.
-    //
-    //
-    //
-    //
-    //
-    mCurrentLinkDataPosition = 0;
-    mCurrentHalfCRULinkHeaderPoisition = 0;
-    mCurrentLink = 0;
-
-    while (mDataPointer != mDataEndPointer && mCurrentLinkDataPosition < mTotalHalfCRUDataLength * 16) { // while we are stil in the rdh block and with in the current link
-      LOG(debug) << "in while loop with state of :" << mState;
-      LOGF(debug, "mDataPointer: %p != mDataEndPointer: %p, mCurrentLinkDataPosition=%d != mTotalHalfCRUDataLenght=%d\n", (void*)mDataPointer, (void*)mDataPointer, mCurrentLinkDataPosition, mTotalHalfCRUDataLength * 16);
-      if (mState == CRUStateHalfChamber) {
-        // read in the halfchamber header.
-        LOGF(debug, "mTrackletHCHeader is at %p had value 0x%08x", (void*)mDataPointer, mDataPointer[0]);
-        mTrackletHCHeader = (TrackletHCHeader*)mDataPointer;
-        mDataPointer += 16; //sizeof(mTrackletHCHeader)/4;
-        mHCID = getHCIDFromTrackletHCHeader(mTrackletHCHeader->word);
-        LOG(info) << "HCID set to  : " << mHCID;
-        //     LOGF(info,"mDataPointer after advancing past TrackletHCHeader is at %p has value 0x%08x",(void*)mDataPointer,mDataPointer[0]);
-        //if(debugparsing){
-        //     printHalfChamber(*mTrackletHCHeader);
-        // }
-        mState = CRUStateTrackletMCMHeader; //now we expect a TrackletMCMHeader or some padding.
-      }
-      if (mState == CRUStateTrackletMCMHeader) {
-        LOGF(debug, "mTrackletMCMHeader is at %p had value 0x%08x", (void*)mDataPointer, mDataPointer[0]);
-        if (debugparsing) {
-          //           LOG(debug) << " state is : " << mState << " about to read TrackletMCMHeader";
+    if(mBufferLocation > currentLinkStart+mCurrentHalfCRULinkLengths[mCurrentLink] )
+    {
+        currentLinkStart+= mCurrentHalfCRULinkLengths[mCurrentLink];
+        //increment the link we are on, change relevant other data.
+        mCurrentLink++;
+        //sanity check
+        if(mCurrentLink==15){
+            LOG(warn) << "link count during passing is 15, should end at 14 ...";
         }
+    }
+      if (mState == StateTrackletMCMHeader) {
+        LOG(debug)<<  "mTrackletMCMHeader is has value 0x"<< std::hex << word;
         //read the header OR padding of 0xeeee;
-        if (mDataPointer[0] != 0xeeeeeeee) {
+        if (word != 0xeeeeeeee) {
           //we actually have an header word.
-          mTrackletHCHeader = (TrackletHCHeader*)mDataPointer;
-          LOG(debug) << "state mcmheader and word : 0x" << std::hex << mDataPointer[0];
-          mDataPointer++;
+          mTrackletHCHeader = (TrackletHCHeader*)&word;
+          LOG(debug) << "state mcmheader and word : 0x" << std::hex << word;
+          //sanity check of trackletheader ??
+          if(!trackletMCMHeaderSanityCheck(mTrackletMCMHeader)){
+              LOG(warn) << "Sanity check Failure MCMHeader : " << mTrackletMCMHeader;
+          };
+          mBufferLocation++;
           mCurrentLinkDataPosition++;
-          if (debugparsing) {
-            //       printTrackletMCMHeader(*mTrackletHCHeader);
-          }
-          mState = CRUStateTrackletMCMData;
+          mState = StateTrackletMCMData;
         } else { // this is the case of a first padding word for a "noncomplete" tracklet i.e. not all 3 tracklets.
                  //        LOG(debug) << "C";
-          mState = CRUStatePadding;
-          mDataPointer++;
+          mState = StatePadding;
+          mBufferLocation++;
           mCurrentLinkDataPosition++;
-          TRDStatCounters.LinkPadWordCounts[mHCID]++; // keep track off all the padding words.
-          if (debugparsing) {
-            //       printTrackletMCMHeader(*mTrackletHCHeader);
-          }
+      //    TRDStatCounters.LinkPadWordCounts[mHCID]++; // keep track off all the padding words.
         }
       }
-      if (mState == CRUStatePadding) {
-        LOGF(debug, "Padding is at %p had value 0x%08x", (void*)mDataPointer, mDataPointer[0]);
-        LOG(debug) << "state padding and word : 0x" << std::hex << mDataPointer[0];
-        if (mDataPointer[0] == 0xeeeeeeee) {
+      else{
+      if (mState == StatePadding) {
+        LOG(debug) << "state padding and word : 0x" << std::hex << word;
+        if (word == 0xeeeeeeee) {
           //another pointer with padding.
-          mDataPointer++;
+          mBufferLocation++;
           mCurrentLinkDataPosition++;
-          TRDStatCounters.LinkPadWordCounts[mHCID]++; // keep track off all the padding words.
-          if (mDataPointer[0] & 0x1) {
+          //TRDStatCounters.LinkPadWordCounts[mHCID]++; // keep track off all the padding words.
+          if (word & 0x1) {
             //mcmheader
             //        LOG(debug) << "changing state from padding to mcmheader as next datais 0x" << std::hex << mDataPointer[0];
-            mState = CRUStateTrackletMCMHeader;
-          } else if (mDataPointer[0] != 0xeeeeeeee) {
+            mState = StateTrackletMCMHeader;
+          } else if (word != 0xeeeeeeee) {
             //        LOG(debug) << "changing statefrom padding to mcmdata as next datais 0x" << std::hex << mDataPointer[0];
-            mState = CRUStateTrackletMCMData;
+            mState = StateTrackletMCMData;
           }
         } else {
-          LOG(debug) << "some went wrong we are in state padding, but not a pad word. 0x" << (void*)mDataPointer;
+          LOG(debug) << "some went wrong we are in state padding, but not a pad word. 0x" << word;
         }
       }
-      if (mState == CRUStateTrackletMCMData) {
-        LOGF(debug, "mTrackletMCMData is at %p had value 0x%08x", (void*)mDataPointer, mDataPointer[0]);
+      if (mState == StateTrackletMCMData) {
+        LOG(debug) << "mTrackletMCMData is at "<< mBufferLocation <<" had value 0x" << std::hex << word;
         //tracklet data;
         // build tracklet.
         //for the case of on flp build a vector of tracklets, then pack them into a data stream with a header.
         //for dpl build a vector and connect it with a triggerrecord.
-        mTrackletMCMData = (TrackletMCMData*)mDataPointer;
-        mDataPointer++;
+        mTrackletMCMData = (TrackletMCMData*)&word;
+        mBufferLocation++;
         mCurrentLinkDataPosition++;
-        if (mDataPointer[0] == 0xeeeeeeee) {
-          mState = CRUStatePadding;
+        if (word == 0xeeeeeeee) {
+          mState = StatePadding;
           //  LOG(debug) <<"changing to padding from mcmdata" ;
         } else {
-          if (mDataPointer[0] & 0x1) {
-            mState = CRUStateTrackletMCMHeader; // we have more tracklet data;
+          if (word & 0x1) {
+            mState = StateTrackletMCMHeader; // we have more tracklet data;
             LOG(debug) << "changing from MCMData to MCMHeader";
           } else {
-            mState = CRUStateTrackletMCMData;
+            mState = StateTrackletMCMData;
             LOG(debug) << "continuing with mcmdata";
           }
         }
         // Tracklet64 trackletsetQ0(o2::trd::getTrackletQ0());
       }
+
       //accounting ....
       // mCurrentLinkDataPosition256++;
       // mCurrentHalfCRUDataPosition256++;
       // mTotalHalfCRUDataLength++;
-      LOG(debug) << mDataPointer << ":" << mDataEndPointer << " &&  " << mCurrentLinkDataPosition << " != " << mTotalHalfCRUDataLength * 16;
-    }
     //end of data so
+    }
   }
   return 1;
 }
 
-} // namespace trd
-} // namespace o2
+} // namespace o2::trd

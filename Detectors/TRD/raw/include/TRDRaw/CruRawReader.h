@@ -27,6 +27,8 @@
 #include "DataFormatsTRD/RawData.h"
 #include "DataFormatsTRD/Tracklet64.h"
 #include "DataFormatsTRD/TriggerRecord.h"
+#include "TRDRaw/DigitsParser.h"
+#include "TRDRaw/TrackletsParser.h"
 
 namespace o2
 {
@@ -40,6 +42,10 @@ class CruRawReader
   static constexpr bool debugparsing = true;
   enum CRUSate { CRUStateHalfCRUHeader,
                  CRUStateHalfChamber };
+  enum Dataformats { TrackletsDataFormat=0,
+                     DigitsDataFormat,
+                     TestPatternDataFormat,
+                     ConfigEventDataFormat};
 
  public:
   CruRawReader() = default;
@@ -78,6 +84,7 @@ class CruRawReader
  protected:
   uint32_t processHBFs();
   bool buildCRUPayLoad();
+  int DataBufferFormatIs();    ///figure out what format of buffer we have.
   bool processHalfCRU();
   bool processCRULink();
 
@@ -93,7 +100,7 @@ class CruRawReader
 
   std::ifstream mDecoderFile;
   const char* mDataBuffer = nullptr;
-  const uint32_t mMaxCRUBufferSize = 1048576;
+  static const  uint32_t mMaxCRUBufferSize = 1048576;
   std::array<uint32_t, mMaxCRUBufferSize> mCRUPayLoad; //this holds a single cruhalfchamber link to pass to parsing.
   uint32_t mHalfCRUPayLoadRead{0};                     // the words current read in for the currnt cru payload.
   int mCurrentHalfCRULinkHeaderPoisition = 0;
@@ -104,7 +111,7 @@ class CruRawReader
   uint32_t mTotalHalfCRUDataLength;
 
   long mDataBufferSize;
-  uint64_t mDataReadIn = 0;
+//  uint64_t mDataReadIn = 0;
   const uint32_t* mDataPointer = nullptr; // pointer to the current position in the rdh
   const uint32_t* mDataPointerMax = nullptr;
   const uint32_t* mDataEndPointer = nullptr;
@@ -135,6 +142,12 @@ class CruRawReader
   void checkerCheckRDH();
   int mState; // basic state machine for where we are in the parsing.
               // we parse rdh to rdh but data is cru to cru.
+  //the relevant parsers. Not elegant but we need both so pointers to base classes and sending them in with templates or some other such mechanism seems impossible, or its just late and I cant think.
+  //TODO think of a more elegant way of incorporating the parsers.
+  
+  o2::trd::TrackletsParser mTrackletsParser;
+  o2::trd::DigitsParser mDigitsParser;
+
   uint32_t mEventCounter;
   uint32_t mFatalCounter;
   uint32_t mErrorCounter;

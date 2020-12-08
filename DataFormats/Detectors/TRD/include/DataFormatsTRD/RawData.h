@@ -397,6 +397,7 @@ void dumpHalfChamber(o2::trd::TrackletHCHeader& halfchamber);
 void printHalfCRUHeader(o2::trd::HalfCRUHeader& halfcru);
 void dumpHalfCRUHeader(o2::trd::HalfCRUHeader& halfcru);
 std::ostream& operator<<(std::ostream& stream, const HalfCRUHeader& halfcru);
+bool trackletMCMHeaderSanityCheck(const o2::trd::TrackletMCMHeader& header);
 }
 }
 #endif

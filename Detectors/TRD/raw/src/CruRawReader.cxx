@@ -64,7 +64,21 @@ uint32_t CruRawReader::processHBFs()
         // process a halfcru
         // or continue with the remainder of an rdh o2 payload if we got to the end of cru
         // or continue with a new rdh payload if we are not finished with the last cru payload.
-        LOG(warn) << "processHalfCRU return flase";
+        if(mState == CRUStateHalfCRUHeader){
+            //we managed to parse to the next half cru header.
+            //ergo mCRUPayLoad holds the whole links payload, so parse it.
+            // tracklet or digit ??
+            switch(DataBufferFormatIs()){
+                case TrackletsDataFormat : mTrackletsParser.Parse();break;
+                case DigitsDataFormat : mDigitsParser.Parse();break;
+                case ConfigEventDataFormat : break;//mConfigEventParser.Parse();break;
+                case TestPatternDataFormat : break;//mTestPatternParser.Parse();break;
+                default : LOG(warn) << " we cant parse what we dont understand, Error in determining format of databuffer in CRU payload.";
+            }
+        }
+        else{
+            LOG(debug) << "Processed an rdh, no halfcru finished, looping around again to find an end";
+        }
         break; // end of CRU
       }
       mState = CRUStateHalfChamber;
@@ -97,6 +111,12 @@ uint32_t CruRawReader::processHBFs()
   return mDataEndPointer - mDataPointer;
 }
 
+
+int CruRawReader::DataBufferFormatIs()
+{
+    return TrackletsFormat;
+}
+
 bool CruRawReader::buildCRUPayLoad()
 {
   // copy data for the current half cru, and when we eventually get to the end of the payload return 1
@@ -111,6 +131,7 @@ bool CruRawReader::buildCRUPayLoad()
 
 bool CruRawReader::processHalfCRU()
 {
+    //given an rdh payload, read the halfcruheaders find the datablock related to the link.
   /* process a FeeID/halfcru, 15 links */
   LOG(debug) << "--- PROCESS HalfCRU FeeID:" << mFEEID;
   if (mState == CRUStateHalfCRUHeader) {
@@ -124,10 +145,10 @@ bool CruRawReader::processHalfCRU()
                                               mCurrentHalfCRULinkLengths.end(),
                                               decltype(mCurrentHalfCRULinkLengths)::value_type(0));
     // we will always have at least a length of 1 fully padded for each link.
-    //Sanity check,1. each link is >=1, 2. link is < ?? what is the maximum link length.3. header values are sane. define sane?
-
+    //TODO Sanity check,1. each link is >=1, 2. link is < ?? what is the maximum link length.3. header values are sane. define sane?
+    //size sanity check.
     if (mTotalHalfCRUDataLength > mMaxCRUBufferSize) {
-      LOG(fatal) << "Cru wont fit in the allocated buffer  " << mTotalHalfCRUDataLength << " > " << mMaxCruBufferSize;
+      LOG(fatal) << "Cru wont fit in the allocated buffer  " << mTotalHalfCRUDataLength << " > " << mMaxCRUBufferSize;
     }
     LOG(debug) << "Found  a HalfCRUHeader : ";
     LOG(debug) << mCurrentHalfCRUHeader << " with payload total size of : " << mTotalHalfCRUDataLength;
@@ -198,16 +219,6 @@ bool CruRawReader::processCRULink()
   //  uint32_t slotId = GET_TRMDATAHEADER_SLOTID(*mDataPointer);
   return false;
 }
-
-bool CruRawReader::checkerCheck()
-{
-  /* checker check */
-
-  LOG(debug) << "--- CHECK EVENT";
-
-  return false;
-}
-
 
 void CruRawReader::resetCounters()
 {
