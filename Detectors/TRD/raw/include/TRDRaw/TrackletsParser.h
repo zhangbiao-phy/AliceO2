@@ -42,7 +42,8 @@ class TrackletsParser
 
   int getDataWordsParsed() { return mDataWordsParsed; }
   int getTrackletsFound() { return mTrackletsFound; }
-  enum TrackletParserState { StateTrackletMCMHeader,
+  enum TrackletParserState { StateTrackletHCHeader, // always the start of a half chamber.
+                             StateTrackletMCMHeader,
                              StateTrackletMCMData,
                              StatePadding };
 

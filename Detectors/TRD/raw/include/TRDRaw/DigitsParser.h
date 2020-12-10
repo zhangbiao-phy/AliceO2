@@ -17,17 +17,13 @@
 
 #include "Framework/Task.h"
 #include "Framework/DataProcessorSpec.h"
-#include "TRDRaw/CruRawReader.h"
-#include "TRDRaw/CompressedRawReader.h"
 #include <fstream>
+#include "TRDBase/Digit.h"
 
 using namespace o2::framework;
 
-namespace o2
+namespace o2:: trd
 {
-namespace trd
-{
-class Digit;
 
 class DigitsParser
 {
@@ -48,7 +44,6 @@ class DigitsParser
   int mParsedWords{0};                    // words parsed in data vector, last complete bit is not parsed, and left for another round of data update.
 };
 
-} // namespace trd
-} // namespace o2
+} // namespace o2::trd
 
 #endif // O2_TRD_DIGITSPARSER

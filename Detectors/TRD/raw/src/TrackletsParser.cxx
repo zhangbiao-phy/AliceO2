@@ -31,7 +31,7 @@ int TrackletsParser::Parse()
   //we are handed the buffer payload of an rdh and need to parse its contents.
   //producing a vector of digits.
   LOG(debug) << "Tracklet Parser parse of data sitting at :" << std::hex << (void*)mData;
-  //mData holds a buffer of <8kb (the o2 payload) parse placing tracklets in the output vector.
+  //mData holds a buffer containing tracklets parse placing tracklets in the output vector.
   //mData holds 2048 digits.
   // due to the nature of the incoming data, there will *never* straggling digits or for that matter trap outputs spanning a boundary.
   mCurrentLinkDataPosition = 0;
@@ -39,20 +39,26 @@ int TrackletsParser::Parse()
   mBufferLocation=0;
   int currentLinkStart=0;
 
-  for (auto word : *mData) {
+  for (auto word : *mData) { // loop over the entire cru payload.
     //loop over all the words ... duh
     //this is the payload sans the cruhalflinkheaders.
-    if(mBufferLocation > currentLinkStart+mCurrentHalfCRULinkLengths[mCurrentLink] )
-    {
+    if(mBufferLocation == currentLinkStart + mCurrentHalfCRULinkLengths[mCurrentLink] ) {
+        // we are changing a link.
         currentLinkStart+= mCurrentHalfCRULinkLengths[mCurrentLink];
         //increment the link we are on, change relevant other data.
         mCurrentLink++;
         //sanity check
         if(mCurrentLink==15){
-            LOG(warn) << "link count during passing is 15, should end at 14 ...";
+            LOG(warn) << "link count during parsing is 15, should end at 14 ...";
         }
+        mState=StateTrackletHCHeader;// we are the start of another link.
     }
-      if (mState == StateTrackletMCMHeader) {
+    
+    if(mState == StateTrackletHCHeader && (mBufferLocation == currentLinkStart + mCurrentHalfCRULinkLengths[mCurrentLink] )) {
+        LOG(warn) << " Parsing state is StateTrackletHCHeader, yet according to the lengths we are not at the beginning of a half chamber. " << mBufferLocation << " != " << currentLinkStart <<"+"<< mCurrentHalfCRULinkLengths[mCurrentLink];
+    }
+        // we are changing a link.
+    if (mState == StateTrackletMCMHeader) {
         LOG(debug)<<  "mTrackletMCMHeader is has value 0x"<< std::hex << word;
         //read the header OR padding of 0xeeee;
         if (word != 0xeeeeeeee) {
@@ -60,7 +66,7 @@ int TrackletsParser::Parse()
           mTrackletHCHeader = (TrackletHCHeader*)&word;
           LOG(debug) << "state mcmheader and word : 0x" << std::hex << word;
           //sanity check of trackletheader ??
-          if(!trackletMCMHeaderSanityCheck(mTrackletMCMHeader)){
+          if(!trackletMCMHeaderSanityCheck(*mTrackletMCMHeader)){
               LOG(warn) << "Sanity check Failure MCMHeader : " << mTrackletMCMHeader;
           };
           mBufferLocation++;

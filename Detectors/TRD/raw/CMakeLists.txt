@@ -10,13 +10,13 @@
 
 o2_add_library(TRDRaw
     SOURCES #src/CruCompressor.cxx
-            src/CruCompressorTask.cxx
             #src/EpnDataReader.cxx
-            src/EpnDataReaderTask.cxx
-            src/CruRawReader.cxx
-            src/CompressedRawReader.cxx
             src/DigitsParser.cxx
             src/TrackletsParser.cxx
+            src/CruRawReader.cxx
+            src/CompressedRawReader.cxx
+            src/EpnDataReaderTask.cxx
+            src/CruCompressorTask.cxx
                PUBLIC_LINK_LIBRARIES O2::TRDBase O2::Framework O2::Headers 
                                      O2::DataFormatsTRD O2::DetectorsRaw
 	       )

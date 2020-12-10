@@ -130,7 +130,7 @@ struct TrackletHCHeader {
     //             |   |              ||------------  8-10 layer
     //             |   |              |------------- 11    always 0x1
     //             |   |              |------------- 12 side of chamber
-    //             |   ----------------------------- 13-72 MCM Clock counter
+    //             |   ----------------------------- 13-27 MCM Clock counter
     //             --------------------------------- 28-31 tracklet data format number
     uint32_t word;
     struct {
@@ -139,7 +139,7 @@ struct TrackletHCHeader {
       uint32_t layer : 3;
       uint32_t one : 1;   //always 1
       uint32_t side : 1;  // side of chamber
-      uint32_t MCLK : 15; // MCM clock counter 120MHz ... for simulation -- incrementing, and same number in all for each event.
+      uint32_t MCLK : 15; // MCM clock counter 120MHz ... for simulation -- incrementing, and uniform across an event
       uint32_t format : 4;
       //  0 baseline PID 3 time slices, 7 bit each
       //  1 DO NOT USE ! reserved for tracklet end marker disambiguation
@@ -397,7 +397,8 @@ void dumpHalfChamber(o2::trd::TrackletHCHeader& halfchamber);
 void printHalfCRUHeader(o2::trd::HalfCRUHeader& halfcru);
 void dumpHalfCRUHeader(o2::trd::HalfCRUHeader& halfcru);
 std::ostream& operator<<(std::ostream& stream, const HalfCRUHeader& halfcru);
-bool trackletMCMHeaderSanityCheck(const o2::trd::TrackletMCMHeader& header);
+bool trackletMCMHeaderSanityCheck(o2::trd::TrackletMCMHeader& header);
+bool trackletHCHeaderSanityCheck(o2::trd::TrackletHCHeader& header);
 }
 }
 #endif

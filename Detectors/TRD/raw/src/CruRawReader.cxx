@@ -11,12 +11,14 @@
 /// @file   CruRawReader.h
 /// @brief  TRD raw data translator
 
-#include "TRDRaw/CruRawReader.h"
-#include "DataFormatsTRD/RawData.h"
-#include "DataFormatsTRD/Tracklet64.h"
 #include "DetectorsRaw/RDHUtils.h"
 //#include "Headers/RAWDataHeader.h"
 #include "Headers/RDHAny.h"
+#include "TRDRaw/CruRawReader.h"
+#include "DataFormatsTRD/RawData.h"
+#include "DataFormatsTRD/Tracklet64.h"
+#include "TRDRaw/DigitsParser.h"
+#include "TRDRaw/TrackletsParser.h"
 
 #include <cstring>
 #include <string>
@@ -114,7 +116,7 @@ uint32_t CruRawReader::processHBFs()
 
 int CruRawReader::DataBufferFormatIs()
 {
-    return TrackletsFormat;
+    return TrackletsDataFormat;
 }
 
 bool CruRawReader::buildCRUPayLoad()

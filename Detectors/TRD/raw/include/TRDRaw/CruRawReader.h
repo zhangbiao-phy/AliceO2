@@ -21,19 +21,17 @@
 #include <string>
 #include <cstdint>
 #include <array>
+#include <vector>
 #include "Headers/RAWDataHeader.h"
 #include "Headers/RDHAny.h"
 #include "DetectorsRaw/RDHUtils.h"
 #include "DataFormatsTRD/RawData.h"
-#include "DataFormatsTRD/Tracklet64.h"
-#include "DataFormatsTRD/TriggerRecord.h"
 #include "TRDRaw/DigitsParser.h"
 #include "TRDRaw/TrackletsParser.h"
 
-namespace o2
+namespace o2::trd
 {
-namespace trd
-{
+class Tracklet64;
 class TriggerRecord;
 
 class CruRawReader
@@ -59,11 +57,11 @@ class CruRawReader
     do {
       LOG(info) << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! start";
       LOG(info) << "do while loop count " << dowhilecount++;
-      LOG(info) << " data readin : " << mDataReadIn;
+//      LOG(info) << " data readin : " << mDataReadIn;
       LOG(info) << " mDataBuffer :" << (void*)mDataBuffer;
       int datareadfromhbf = processHBFs();
       LOG(info) << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! end with " << datareadfromhbf;
-      LOG(info) << "mDataReadIn :" << mDataReadIn << " mDataBufferSize:" << mDataBufferSize;
+ //     LOG(info) << "mDataReadIn :" << mDataReadIn << " mDataBufferSize:" << mDataBufferSize;
     } while (mDataReadIn < mDataBufferSize);
 
     return false;
@@ -111,7 +109,7 @@ class CruRawReader
   uint32_t mTotalHalfCRUDataLength;
 
   long mDataBufferSize;
-//  uint64_t mDataReadIn = 0;
+  uint64_t mDataReadIn = 0;
   const uint32_t* mDataPointer = nullptr; // pointer to the current position in the rdh
   const uint32_t* mDataPointerMax = nullptr;
   const uint32_t* mDataEndPointer = nullptr;
@@ -144,9 +142,9 @@ class CruRawReader
               // we parse rdh to rdh but data is cru to cru.
   //the relevant parsers. Not elegant but we need both so pointers to base classes and sending them in with templates or some other such mechanism seems impossible, or its just late and I cant think.
   //TODO think of a more elegant way of incorporating the parsers.
-  
-  o2::trd::TrackletsParser mTrackletsParser;
-  o2::trd::DigitsParser mDigitsParser;
+
+  TrackletsParser mTrackletsParser;
+  DigitsParser mDigitsParser;
 
   uint32_t mEventCounter;
   uint32_t mFatalCounter;
@@ -155,17 +153,25 @@ class CruRawReader
   std::vector<Tracklet64> mEventTracklets; // when this runs properly it will only 6 for the flp its runnung on.
   std::vector<o2::trd::TriggerRecord> mEventStartPositions;
 
-  struct TRDDataCounters_t {                      //TODO this should go into a dpl message for catching by qc ?? I think.
+  struct TRDDataCounters_t {  //thisis on a per event basis   
+      //TODO this should go into a dpl message for catching by qc ?? I think.
     std::array<uint32_t, 1080> LinkWordCounts;    //units of 256bits "cru word"
     std::array<uint32_t, 1080> LinkPadWordCounts; // units of 32 bits the data pad word size.
     std::array<uint32_t, 1080> LinkFreq;          //units of 256bits "cru word"
                                                   //from the above you can get the stats for supermodule and detector.
+    std::array<bool, 1080> LinkEmpty;             // Link only has padding words, probably not serious in pp.
+    uint32_t EmptyLinks;
+    //maybe change this to actual traps ?? but it will get large.
+    std::array<uint32_t, 1080> LinkTrackletPerTrap1;             // incremented if a trap on this link has 1 tracklet
+    std::array<uint32_t, 1080> LinkTrackletPerTrap2;             // incremented if a trap on this link has 2 tracklet
+    std::array<uint32_t, 1080> LinkTrackletPerTrap3;             // incremented if a trap on this link has 3 tracklet
+    std::vector<uint32_t> EmptyTraps;             // MCM indexes of traps that are empty ?? list might better
   } TRDStatCounters;
 
   /** summary data **/
 };
 
 } // namespace trd
-} // namespace o2
+ // namespace o2
 
 #endif

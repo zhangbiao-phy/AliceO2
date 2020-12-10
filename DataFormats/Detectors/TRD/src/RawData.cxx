@@ -228,7 +228,7 @@ std::ostream& operator<<(std::ostream& stream, const HalfCRUHeader& halfcru)
   return stream;
 }
 
-bool trackletMCMHeaderSanityCheck(const o2::trd::TrackletMCMHeader& header)
+bool trackletMCMHeaderSanityCheck(o2::trd::TrackletMCMHeader& header)
 {
     // a bit limited to what we can check.
   bool goodheader=true;
@@ -241,5 +241,15 @@ bool trackletMCMHeaderSanityCheck(const o2::trd::TrackletMCMHeader& header)
 
   return goodheader;
 }
+
+bool trackletHCHeaderSanityCheck(o2::trd::TrackletHCHeader& header)
+{
+    bool goodheader=true;
+    if(header.one != 1) goodheader=false;
+    if(header.supermodule>17) goodheader=false;
+    //if(header.format != )  only certain format versions are permitted come back an fill in if needed.
+    return goodheader;
+}
+
 } // namespace trd
 } // namespace o2
