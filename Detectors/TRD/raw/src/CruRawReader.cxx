@@ -66,20 +66,26 @@ uint32_t CruRawReader::processHBFs()
         // process a halfcru
         // or continue with the remainder of an rdh o2 payload if we got to the end of cru
         // or continue with a new rdh payload if we are not finished with the last cru payload.
-        if(mState == CRUStateHalfCRUHeader){
-            //we managed to parse to the next half cru header.
-            //ergo mCRUPayLoad holds the whole links payload, so parse it.
-            // tracklet or digit ??
-            switch(DataBufferFormatIs()){
-                case TrackletsDataFormat : mTrackletsParser.Parse();break;
-                case DigitsDataFormat : mDigitsParser.Parse();break;
-                case ConfigEventDataFormat : break;//mConfigEventParser.Parse();break;
-                case TestPatternDataFormat : break;//mTestPatternParser.Parse();break;
-                default : LOG(warn) << " we cant parse what we dont understand, Error in determining format of databuffer in CRU payload.";
-            }
-        }
-        else{
-            LOG(debug) << "Processed an rdh, no halfcru finished, looping around again to find an end";
+        if (mState == CRUStateHalfCRUHeader) {
+          //we managed to parse to the next half cru header.
+          //ergo mCRUPayLoad holds the whole links payload, so parse it.
+          // tracklet or digit ??
+          switch (DataBufferFormatIs()) {
+            case TrackletsDataFormat:
+              mTrackletsParser.Parse();
+              break;
+            case DigitsDataFormat:
+              mDigitsParser.Parse();
+              break;
+            case ConfigEventDataFormat:
+              break; //mConfigEventParser.Parse();break;
+            case TestPatternDataFormat:
+              break; //mTestPatternParser.Parse();break;
+            default:
+              LOG(warn) << " we cant parse what we dont understand, Error in determining format of databuffer in CRU payload.";
+          }
+        } else {
+          LOG(debug) << "Processed an rdh, no halfcru finished, looping around again to find an end";
         }
         break; // end of CRU
       }
@@ -113,10 +119,9 @@ uint32_t CruRawReader::processHBFs()
   return mDataEndPointer - mDataPointer;
 }
 
-
 int CruRawReader::DataBufferFormatIs()
 {
-    return TrackletsDataFormat;
+  return TrackletsDataFormat;
 }
 
 bool CruRawReader::buildCRUPayLoad()
@@ -133,7 +138,7 @@ bool CruRawReader::buildCRUPayLoad()
 
 bool CruRawReader::processHalfCRU()
 {
-    //given an rdh payload, read the halfcruheaders find the datablock related to the link.
+  //given an rdh payload, read the halfcruheaders find the datablock related to the link.
   /* process a FeeID/halfcru, 15 links */
   LOG(debug) << "--- PROCESS HalfCRU FeeID:" << mFEEID;
   if (mState == CRUStateHalfCRUHeader) {

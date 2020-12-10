@@ -41,16 +41,16 @@ void buildTrackletHCHeaderd(TrackletHCHeader& header, int detector, int rob, int
   buildTrackletHCHeader(header, sector, stack, layer, side, chipclock, format);
 }
 
-uint32_t getHCIDFromTrackletHCHeader(const TrackletHCHeader &header)
+uint32_t getHCIDFromTrackletHCHeader(const TrackletHCHeader& header)
 {
   return header.layer * 2 + header.stack * constants::NLAYER * 2 + header.supermodule * constants::NLAYER * constants::NSTACK * 2 + header.side;
 }
 
 // same method alternate input simpler to send a word pointer as const
-uint32_t getHCIDFromTrackletHCHeader(const uint32_t &headerword)
+uint32_t getHCIDFromTrackletHCHeader(const uint32_t& headerword)
 {
   TrackletHCHeader header;
-  header.word =headerword;
+  header.word = headerword;
   return header.layer * 2 + header.stack * constants::NLAYER * 2 + header.supermodule * constants::NLAYER * constants::NSTACK * 2 + header.side;
 }
 
@@ -230,25 +230,31 @@ std::ostream& operator<<(std::ostream& stream, const HalfCRUHeader& halfcru)
 
 bool trackletMCMHeaderSanityCheck(o2::trd::TrackletMCMHeader& header)
 {
-    // a bit limited to what we can check.
-  bool goodheader=true;
-  if(header.onea != 1) goodheader=false;
-  if(header.oneb != 1) goodheader=false;
+  // a bit limited to what we can check.
+  bool goodheader = true;
+  if (header.onea != 1)
+    goodheader = false;
+  if (header.oneb != 1)
+    goodheader = false;
   // if we have 3rd tracklet (pid2!=0) then we must have all the others as well.
-  if((header.pid2 != 0) && (header.pid1 == 0 || header.pid0 == 0)) goodheader=false;
+  if ((header.pid2 != 0) && (header.pid1 == 0 || header.pid0 == 0))
+    goodheader = false;
   // sim for 2 tracklets.
-  if((header.pid1 != 0) && (header.pid0 == 0 )) goodheader=false;
+  if ((header.pid1 != 0) && (header.pid0 == 0))
+    goodheader = false;
 
   return goodheader;
 }
 
 bool trackletHCHeaderSanityCheck(o2::trd::TrackletHCHeader& header)
 {
-    bool goodheader=true;
-    if(header.one != 1) goodheader=false;
-    if(header.supermodule>17) goodheader=false;
-    //if(header.format != )  only certain format versions are permitted come back an fill in if needed.
-    return goodheader;
+  bool goodheader = true;
+  if (header.one != 1)
+    goodheader = false;
+  if (header.supermodule > 17)
+    goodheader = false;
+  //if(header.format != )  only certain format versions are permitted come back an fill in if needed.
+  return goodheader;
 }
 
 } // namespace trd

@@ -40,10 +40,10 @@ class CruRawReader
   static constexpr bool debugparsing = true;
   enum CRUSate { CRUStateHalfCRUHeader,
                  CRUStateHalfChamber };
-  enum Dataformats { TrackletsDataFormat=0,
+  enum Dataformats { TrackletsDataFormat = 0,
                      DigitsDataFormat,
                      TestPatternDataFormat,
-                     ConfigEventDataFormat};
+                     ConfigEventDataFormat };
 
  public:
   CruRawReader() = default;
@@ -57,11 +57,11 @@ class CruRawReader
     do {
       LOG(info) << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! start";
       LOG(info) << "do while loop count " << dowhilecount++;
-//      LOG(info) << " data readin : " << mDataReadIn;
+      //      LOG(info) << " data readin : " << mDataReadIn;
       LOG(info) << " mDataBuffer :" << (void*)mDataBuffer;
       int datareadfromhbf = processHBFs();
       LOG(info) << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! end with " << datareadfromhbf;
- //     LOG(info) << "mDataReadIn :" << mDataReadIn << " mDataBufferSize:" << mDataBufferSize;
+      //     LOG(info) << "mDataReadIn :" << mDataReadIn << " mDataBufferSize:" << mDataBufferSize;
     } while (mDataReadIn < mDataBufferSize);
 
     return false;
@@ -82,7 +82,7 @@ class CruRawReader
  protected:
   uint32_t processHBFs();
   bool buildCRUPayLoad();
-  int DataBufferFormatIs();    ///figure out what format of buffer we have.
+  int DataBufferFormatIs(); ///figure out what format of buffer we have.
   bool processHalfCRU();
   bool processCRULink();
 
@@ -98,7 +98,7 @@ class CruRawReader
 
   std::ifstream mDecoderFile;
   const char* mDataBuffer = nullptr;
-  static const  uint32_t mMaxCRUBufferSize = 1048576;
+  static const uint32_t mMaxCRUBufferSize = 1048576;
   std::array<uint32_t, mMaxCRUBufferSize> mCRUPayLoad; //this holds a single cruhalfchamber link to pass to parsing.
   uint32_t mHalfCRUPayLoadRead{0};                     // the words current read in for the currnt cru payload.
   int mCurrentHalfCRULinkHeaderPoisition = 0;
@@ -153,8 +153,8 @@ class CruRawReader
   std::vector<Tracklet64> mEventTracklets; // when this runs properly it will only 6 for the flp its runnung on.
   std::vector<o2::trd::TriggerRecord> mEventStartPositions;
 
-  struct TRDDataCounters_t {  //thisis on a per event basis   
-      //TODO this should go into a dpl message for catching by qc ?? I think.
+  struct TRDDataCounters_t { //thisis on a per event basis
+    //TODO this should go into a dpl message for catching by qc ?? I think.
     std::array<uint32_t, 1080> LinkWordCounts;    //units of 256bits "cru word"
     std::array<uint32_t, 1080> LinkPadWordCounts; // units of 32 bits the data pad word size.
     std::array<uint32_t, 1080> LinkFreq;          //units of 256bits "cru word"
@@ -162,16 +162,16 @@ class CruRawReader
     std::array<bool, 1080> LinkEmpty;             // Link only has padding words, probably not serious in pp.
     uint32_t EmptyLinks;
     //maybe change this to actual traps ?? but it will get large.
-    std::array<uint32_t, 1080> LinkTrackletPerTrap1;             // incremented if a trap on this link has 1 tracklet
-    std::array<uint32_t, 1080> LinkTrackletPerTrap2;             // incremented if a trap on this link has 2 tracklet
-    std::array<uint32_t, 1080> LinkTrackletPerTrap3;             // incremented if a trap on this link has 3 tracklet
-    std::vector<uint32_t> EmptyTraps;             // MCM indexes of traps that are empty ?? list might better
+    std::array<uint32_t, 1080> LinkTrackletPerTrap1; // incremented if a trap on this link has 1 tracklet
+    std::array<uint32_t, 1080> LinkTrackletPerTrap2; // incremented if a trap on this link has 2 tracklet
+    std::array<uint32_t, 1080> LinkTrackletPerTrap3; // incremented if a trap on this link has 3 tracklet
+    std::vector<uint32_t> EmptyTraps;                // MCM indexes of traps that are empty ?? list might better
   } TRDStatCounters;
 
   /** summary data **/
 };
 
-} // namespace trd
- // namespace o2
+} // namespace o2::trd
+  // namespace o2
 
 #endif

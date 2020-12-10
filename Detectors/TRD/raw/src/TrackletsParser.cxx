@@ -36,51 +36,50 @@ int TrackletsParser::Parse()
   // due to the nature of the incoming data, there will *never* straggling digits or for that matter trap outputs spanning a boundary.
   mCurrentLinkDataPosition = 0;
   mCurrentLink = 0;
-  mBufferLocation=0;
-  int currentLinkStart=0;
+  mBufferLocation = 0;
+  int currentLinkStart = 0;
 
   for (auto word : *mData) { // loop over the entire cru payload.
     //loop over all the words ... duh
     //this is the payload sans the cruhalflinkheaders.
-    if(mBufferLocation == currentLinkStart + mCurrentHalfCRULinkLengths[mCurrentLink] ) {
-        // we are changing a link.
-        currentLinkStart+= mCurrentHalfCRULinkLengths[mCurrentLink];
-        //increment the link we are on, change relevant other data.
-        mCurrentLink++;
-        //sanity check
-        if(mCurrentLink==15){
-            LOG(warn) << "link count during parsing is 15, should end at 14 ...";
-        }
-        mState=StateTrackletHCHeader;// we are the start of another link.
-    }
-    
-    if(mState == StateTrackletHCHeader && (mBufferLocation == currentLinkStart + mCurrentHalfCRULinkLengths[mCurrentLink] )) {
-        LOG(warn) << " Parsing state is StateTrackletHCHeader, yet according to the lengths we are not at the beginning of a half chamber. " << mBufferLocation << " != " << currentLinkStart <<"+"<< mCurrentHalfCRULinkLengths[mCurrentLink];
-    }
-        // we are changing a link.
-    if (mState == StateTrackletMCMHeader) {
-        LOG(debug)<<  "mTrackletMCMHeader is has value 0x"<< std::hex << word;
-        //read the header OR padding of 0xeeee;
-        if (word != 0xeeeeeeee) {
-          //we actually have an header word.
-          mTrackletHCHeader = (TrackletHCHeader*)&word;
-          LOG(debug) << "state mcmheader and word : 0x" << std::hex << word;
-          //sanity check of trackletheader ??
-          if(!trackletMCMHeaderSanityCheck(*mTrackletMCMHeader)){
-              LOG(warn) << "Sanity check Failure MCMHeader : " << mTrackletMCMHeader;
-          };
-          mBufferLocation++;
-          mCurrentLinkDataPosition++;
-          mState = StateTrackletMCMData;
-        } else { // this is the case of a first padding word for a "noncomplete" tracklet i.e. not all 3 tracklets.
-                 //        LOG(debug) << "C";
-          mState = StatePadding;
-          mBufferLocation++;
-          mCurrentLinkDataPosition++;
-      //    TRDStatCounters.LinkPadWordCounts[mHCID]++; // keep track off all the padding words.
-        }
+    if (mBufferLocation == currentLinkStart + mCurrentHalfCRULinkLengths[mCurrentLink]) {
+      // we are changing a link.
+      currentLinkStart += mCurrentHalfCRULinkLengths[mCurrentLink];
+      //increment the link we are on, change relevant other data.
+      mCurrentLink++;
+      //sanity check
+      if (mCurrentLink == 15) {
+        LOG(warn) << "link count during parsing is 15, should end at 14 ...";
       }
-      else{
+      mState = StateTrackletHCHeader; // we are the start of another link.
+    }
+
+    if (mState == StateTrackletHCHeader && (mBufferLocation == currentLinkStart + mCurrentHalfCRULinkLengths[mCurrentLink])) {
+      LOG(warn) << " Parsing state is StateTrackletHCHeader, yet according to the lengths we are not at the beginning of a half chamber. " << mBufferLocation << " != " << currentLinkStart << "+" << mCurrentHalfCRULinkLengths[mCurrentLink];
+    }
+    // we are changing a link.
+    if (mState == StateTrackletMCMHeader) {
+      LOG(debug) << "mTrackletMCMHeader is has value 0x" << std::hex << word;
+      //read the header OR padding of 0xeeee;
+      if (word != 0xeeeeeeee) {
+        //we actually have an header word.
+        mTrackletHCHeader = (TrackletHCHeader*)&word;
+        LOG(debug) << "state mcmheader and word : 0x" << std::hex << word;
+        //sanity check of trackletheader ??
+        if (!trackletMCMHeaderSanityCheck(*mTrackletMCMHeader)) {
+          LOG(warn) << "Sanity check Failure MCMHeader : " << mTrackletMCMHeader;
+        };
+        mBufferLocation++;
+        mCurrentLinkDataPosition++;
+        mState = StateTrackletMCMData;
+      } else { // this is the case of a first padding word for a "noncomplete" tracklet i.e. not all 3 tracklets.
+               //        LOG(debug) << "C";
+        mState = StatePadding;
+        mBufferLocation++;
+        mCurrentLinkDataPosition++;
+        //    TRDStatCounters.LinkPadWordCounts[mHCID]++; // keep track off all the padding words.
+      }
+    } else {
       if (mState == StatePadding) {
         LOG(debug) << "state padding and word : 0x" << std::hex << word;
         if (word == 0xeeeeeeee) {
@@ -101,7 +100,7 @@ int TrackletsParser::Parse()
         }
       }
       if (mState == StateTrackletMCMData) {
-        LOG(debug) << "mTrackletMCMData is at "<< mBufferLocation <<" had value 0x" << std::hex << word;
+        LOG(debug) << "mTrackletMCMData is at " << mBufferLocation << " had value 0x" << std::hex << word;
         //tracklet data;
         // build tracklet.
         //for the case of on flp build a vector of tracklets, then pack them into a data stream with a header.
@@ -128,7 +127,7 @@ int TrackletsParser::Parse()
       // mCurrentLinkDataPosition256++;
       // mCurrentHalfCRUDataPosition256++;
       // mTotalHalfCRUDataLength++;
-    //end of data so
+      //end of data so
     }
   }
   return 1;

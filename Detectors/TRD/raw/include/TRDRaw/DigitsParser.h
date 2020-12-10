@@ -22,7 +22,7 @@
 
 using namespace o2::framework;
 
-namespace o2:: trd
+namespace o2::trd
 {
 
 class DigitsParser
