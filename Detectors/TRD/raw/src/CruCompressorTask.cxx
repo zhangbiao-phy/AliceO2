@@ -42,7 +42,8 @@ void CruCompressorTask::init(InitContext& ic)
 
 void CruCompressorTask::run(ProcessingContext& pc)
 {
-  LOG(info) << "TRD Translator Task run";
+  LOG(info) << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! INFO TRD Translator Task run";
+  LOG(debug) << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DEBUG TRD Translator Task run";
 
   /* set encoder output buffer */
   char bufferOut[1048576];

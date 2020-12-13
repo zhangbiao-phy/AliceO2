@@ -19,6 +19,8 @@
 #include "Framework/DataProcessorSpec.h"
 #include <fstream>
 #include "TRDBase/Digit.h"
+#include "DataFormatsTRD/Tracklet64.h"
+#include "DataFormatsTRD/TriggerRecord.h"
 
 using namespace o2::framework;
 
@@ -36,11 +38,12 @@ class DigitsParser
     return Parse();
   };
   uint32_t Parse();
-  int setData(std::vector<uint64_t>* data) { mData = data; };
+  void setData(std::vector<uint64_t>* data) { mData = data; };
 
  private:
   std::vector<uint64_t>* mData = nullptr; // parsed in vector of raw data to parse.
-  std::vector<Digit> mDigits;             // parsed in vector of raw data to parse.
+  std::vector<Digit> mDigits;             // outgoing parsed digits
+  std::vector<TriggerRecord> mTriggerRecords; // trigger records to index into the digits vector.
   int mParsedWords{0};                    // words parsed in data vector, last complete bit is not parsed, and left for another round of data update.
 };
 

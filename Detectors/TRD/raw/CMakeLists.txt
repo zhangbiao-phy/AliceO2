@@ -33,3 +33,5 @@ o2_add_library(TRDRaw
                   PUBLIC_LINK_LIBRARIES O2::TRDRaw
 		  )
 
+#      add_definitions(-DDEBUG)
+

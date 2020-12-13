@@ -107,6 +107,7 @@ class CruRawReader
   uint32_t mCurrentLinkDataPosition;       // count of data read for current link in units of 256 bits
   uint32_t mCurrentHalfCRUDataPosition256; //count of data read for this half cru.
   uint32_t mTotalHalfCRUDataLength;
+  uint32_t mTotalHalfCRUDataLength256;
 
   long mDataBufferSize;
   uint64_t mDataReadIn = 0;
