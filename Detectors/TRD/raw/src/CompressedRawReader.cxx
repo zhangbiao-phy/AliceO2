@@ -68,7 +68,7 @@ uint32_t CompressedRawReader::processHBFs()
         LOG(warn) << "processHalfCRU return flase";
         break; // end of CRU
       }
- //     mState = CRUStateHalfChamber;
+      //     mState = CRUStateHalfChamber;
       //buildCRUPayLoad(); // the rest of the hbf for the subsequent cruhalfchamber payload.
       // TODO is this even possible if hbfs upto the stop  is for one event and each cru header is for 1 event?
     }
@@ -115,7 +115,7 @@ bool CompressedRawReader::buildCRUPayLoad()
 bool CompressedRawReader::processHalfCRU()
 {
   /* process a FeeID/halfcru, 15 links */
-//  LOG(debug) << "--- PROCESS HalfCRU FeeID:" << mFEEID;
+  //  LOG(debug) << "--- PROCESS HalfCRU FeeID:" << mFEEID;
   mCurrentLinkDataPosition = 0;
 
   /* check TRD Data Header */

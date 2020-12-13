@@ -41,10 +41,10 @@ class DigitsParser
   void setData(std::vector<uint64_t>* data) { mData = data; };
 
  private:
-  std::vector<uint64_t>* mData = nullptr; // parsed in vector of raw data to parse.
-  std::vector<Digit> mDigits;             // outgoing parsed digits
+  std::vector<uint64_t>* mData = nullptr;     // parsed in vector of raw data to parse.
+  std::vector<Digit> mDigits;                 // outgoing parsed digits
   std::vector<TriggerRecord> mTriggerRecords; // trigger records to index into the digits vector.
-  int mParsedWords{0};                    // words parsed in data vector, last complete bit is not parsed, and left for another round of data update.
+  int mParsedWords{0};                        // words parsed in data vector, last complete bit is not parsed, and left for another round of data update.
 };
 
 } // namespace o2::trd

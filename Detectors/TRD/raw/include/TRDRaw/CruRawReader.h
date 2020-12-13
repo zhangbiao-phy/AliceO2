@@ -173,6 +173,6 @@ class CruRawReader
 };
 
 } // namespace o2::trd
-  // namespace o2
+// namespace o2
 
 #endif

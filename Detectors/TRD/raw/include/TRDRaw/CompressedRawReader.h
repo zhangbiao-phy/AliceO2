@@ -81,8 +81,8 @@ class CompressedRawReader
   bool buildCRUPayLoad();
   bool processHalfCRU();
   bool processCRULink();
-  std::vector<Tracklet64> & getTracklets();
-  std::vector<TriggerRecord> & getTriggerRecords();
+  std::vector<Tracklet64>& getTracklets();
+  std::vector<TriggerRecord>& getTriggerRecords();
 
   /** decoder private functions and data members **/
 
@@ -106,8 +106,8 @@ class CompressedRawReader
   uint8_t mDataNextWordStep = 2;
   const o2::header::RDHAny* mDataRDH;
   // no need to waste time doing the copy  std::array<uint32_t,8> mCurrentCRUWord; // data for a cru comes in words of 256 bits.
-  uint32_t mCurrentLinkDataPosition;       // count of data read for current link in units of 256 bits
-  uint32_t mCompressedState; // the state of what we are expecting to read currently from the data stream, *not* what we have just read.
+  uint32_t mCurrentLinkDataPosition; // count of data read for current link in units of 256 bits
+  uint32_t mCompressedState;         // the state of what we are expecting to read currently from the data stream, *not* what we have just read.
   bool mError = false;
   bool mFatal = false;
   uint16_t mCurrentLink;               // current link within the halfcru we are parsing 0-14
