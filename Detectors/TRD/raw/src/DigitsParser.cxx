@@ -69,9 +69,9 @@ int DigitsParser::Parse()
         mDigitHCHeader = (DigitHCHeader*)&word;
         LOG(debug) << "state mcmheader and word : 0x" << std::hex << word;
         //sanity check of trackletheader ??  Still to implement.
-//        if (!digitMCMHeaderSanityCheck(*mDigitMCMHeader)) {
-//          LOG(warn) << "Sanity check Failure MCMHeader : " << mDigitMCMHeader;
-//        };
+        //        if (!digitMCMHeaderSanityCheck(*mDigitMCMHeader)) {
+        //          LOG(warn) << "Sanity check Failure MCMHeader : " << mDigitMCMHeader;
+        //        };
         mBufferLocation++;
         mCurrentLinkDataPosition++;
         mState = StateDigitMCMData;

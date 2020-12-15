@@ -299,7 +299,7 @@ struct DigitMCMHeader {
 };
 
 //the odd numbering of 1 2 3 and 6 are taken from the TDP page 111 section 15.7.2, 15.7.3 15.7.4 15.7.5
-struct trdTestPattern1{
+struct trdTestPattern1 {
   //             10987654321098765432109876543210
   // uint32_t:   00000000000000000000000000000000
   //  11h41 for 2flp in data stream. before that on 14th dec was1 flp in timeframe.

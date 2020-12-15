@@ -31,10 +31,10 @@ class TrackletsParser
  public:
   TrackletsParser() = default;
   ~TrackletsParser() = default;
-  void setData(std::array<uint32_t,1048576>* data) { mData = data; }
+  void setData(std::array<uint32_t, 1048576>* data) { mData = data; }
   void setLinkLengths(std::array<uint32_t, 15>& lengths) { mCurrentHalfCRULinkLengths = lengths; };
   int Parse(); // presupposes you have set everything up already.
-  int Parse(std::array<uint32_t,1048576> *data, std::array<uint32_t, 15>& lengths)
+  int Parse(std::array<uint32_t, 1048576>* data, std::array<uint32_t, 15>& lengths)
   {
     setData(data);
     setLinkLengths(lengths);
@@ -49,7 +49,7 @@ class TrackletsParser
                              StatePadding };
 
  private:
-  std::array<uint32_t,1048576>* mData;
+  std::array<uint32_t, 1048576>* mData;
   std::vector<Tracklet64> mTracklets;
   int mState;
   int mDataWordsParsed; // count of data wordsin data that have been parsed in current call to parse.
@@ -63,10 +63,10 @@ class TrackletsParser
   uint16_t mCRUEndpoint; // the upper or lower half of the currently parsed cru 0-14 or 15-29
   uint16_t mCRUID;
   uint16_t mHCID;
-  uint16_t mFEEID;                         // current Fee ID working on
-  uint32_t mCurrentLinkDataPosition256;    // count of data read for current link in units of 256 bits
-  uint32_t mCurrentLinkDataPosition;       // count of data read for current link in units of 256 bits
-  uint32_t mCurrentHalfCRUDataPosition256; //count of data read for this half cru.
+  uint16_t mFEEID;                                     // current Fee ID working on
+  uint32_t mCurrentLinkDataPosition256;                // count of data read for current link in units of 256 bits
+  uint32_t mCurrentLinkDataPosition;                   // count of data read for current link in units of 256 bits
+  uint32_t mCurrentHalfCRUDataPosition256;             //count of data read for this half cru.
   std::array<uint32_t, 15> mCurrentHalfCRULinkLengths; // not in units of 256 bits or 32 bytes or 8 words
   //  std::array<uint32_t, 16> mAverageNumTrackletsPerTrap; TODO come back to this stat.
 };

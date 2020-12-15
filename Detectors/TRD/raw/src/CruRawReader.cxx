@@ -137,7 +137,7 @@ uint32_t CruRawReader::processHBFs()
 
 int CruRawReader::DataBufferFormatIs()
 {
-  return DigitsDataFormat;//TrackletsDataFormat;
+  return DigitsDataFormat; //TrackletsDataFormat;
 }
 
 bool CruRawReader::buildCRUPayLoad()
