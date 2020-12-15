@@ -24,19 +24,20 @@
 
 namespace o2::trd
 {
-
+//TODO put 1048576 in constants
+//
 class TrackletsParser
 {
  public:
   TrackletsParser() = default;
   ~TrackletsParser() = default;
-  void setData(std::vector<uint64_t>* data) { mData = data; }
+  void setData(std::array<uint32_t,1048576>* data) { mData = data; }
   void setLinkLengths(std::array<uint32_t, 15>& lengths) { mCurrentHalfCRULinkLengths = lengths; };
   int Parse(); // presupposes you have set everything up already.
-  int Parse(std::vector<uint64_t>* data, const std::array<uint32_t, 15>& lengths)
+  int Parse(std::array<uint32_t,1048576> *data, std::array<uint32_t, 15>& lengths)
   {
-    mData = data;
-    mCurrentHalfCRULinkLengths = lengths;
+    setData(data);
+    setLinkLengths(lengths);
     return Parse();
   };
 
@@ -48,7 +49,7 @@ class TrackletsParser
                              StatePadding };
 
  private:
-  std::vector<uint64_t>* mData;
+  std::array<uint32_t,1048576>* mData;
   std::vector<Tracklet64> mTracklets;
   int mState;
   int mDataWordsParsed; // count of data wordsin data that have been parsed in current call to parse.
@@ -66,7 +67,7 @@ class TrackletsParser
   uint32_t mCurrentLinkDataPosition256;    // count of data read for current link in units of 256 bits
   uint32_t mCurrentLinkDataPosition;       // count of data read for current link in units of 256 bits
   uint32_t mCurrentHalfCRUDataPosition256; //count of data read for this half cru.
-  std::array<uint32_t, 15> mCurrentHalfCRULinkLengths;
+  std::array<uint32_t, 15> mCurrentHalfCRULinkLengths; // not in units of 256 bits or 32 bytes or 8 words
   //  std::array<uint32_t, 16> mAverageNumTrackletsPerTrap; TODO come back to this stat.
 };
 

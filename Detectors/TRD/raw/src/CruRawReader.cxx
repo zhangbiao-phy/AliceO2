@@ -82,8 +82,8 @@ uint32_t CruRawReader::processHBFs()
                 mTrackletsParser.Parse(&mCRUPayLoad, mCurrentHalfCRULinkLengths);
                 break;
               case DigitsDataFormat:
-                LOG(info) << "Now to parse for Digits";
-                mDigitsParser.Parse();
+                LOG(info) << "Now to parse for Digits with a buffer length of " << mHalfCRUPayLoadRead;
+                mDigitsParser.Parse(&mCRUPayLoad, mCurrentHalfCRULinkLengths);
                 break;
               case ConfigEventDataFormat:
                 LOG(info) << "Now to parse for a ConfigEvent";
@@ -137,7 +137,7 @@ uint32_t CruRawReader::processHBFs()
 
 int CruRawReader::DataBufferFormatIs()
 {
-  return TrackletsDataFormat;
+  return DigitsDataFormat;//TrackletsDataFormat;
 }
 
 bool CruRawReader::buildCRUPayLoad()

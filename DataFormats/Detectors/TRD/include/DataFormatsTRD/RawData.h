@@ -234,7 +234,7 @@ struct DigitHCHeader {
       uint32_t stack : 3;
       uint32_t layer : 3;
       uint32_t supermodule : 5;
-      uint32_t addHCW : 3;
+      uint32_t numberHCW : 3;
       uint32_t minor : 7;
       uint32_t major : 7;
       uint32_t version : 1;
@@ -254,6 +254,7 @@ struct DigitHCHeader {
       uint32_t numtimebins : 6;
     } __attribute__((__packed__));
   };
+#ifdef DIGITALHCOPTIONALHEADER
   //             10987654321098765432109876543210
   // uint32_t:   00000000000000000000000000000000
   union { //page 109 section 15.6.3 in tdp
@@ -279,6 +280,7 @@ struct DigitHCHeader {
       uint32_t svnver : 13;  //assember programm svn revision
     } __attribute__((__packed__));
   };
+#endif
 };
 
 struct DigitMCMHeader {
@@ -296,7 +298,26 @@ struct DigitMCMHeader {
   };
 };
 
-//the odd numbering of 2 3 and 6 are taken from the TDP page 111 section 15.7.3 15.7.4 15.7.5
+//the odd numbering of 1 2 3 and 6 are taken from the TDP page 111 section 15.7.2, 15.7.3 15.7.4 15.7.5
+struct trdTestPattern1{
+  //             10987654321098765432109876543210
+  // uint32_t:   00000000000000000000000000000000
+  //  11h41 for 2flp in data stream. before that on 14th dec was1 flp in timeframe.
+  union {
+    uint32_t word;
+    struct {
+      uint32_t eventcount : 6; // lower 6 bits of e counter.
+      uint32_t stack : 5;
+      uint32_t layer : 3;
+      uint32_t roc : 3;
+      uint32_t rob : 3;
+      uint32_t mcmTp2 : 4;
+      uint32_t cpu : 2;
+      uint32_t counter : 6;
+    } __attribute__((__packed__));
+  };
+};
+
 struct trdTestPattern2 {
   //             10987654321098765432109876543210
   // uint32_t:   00000000000000000000000000000000
@@ -310,7 +331,7 @@ struct trdTestPattern2 {
       uint32_t rob : 3;
       uint32_t mcmTp2 : 4;
       uint32_t cpu : 2;
-      uint32_t counter : 6;
+      uint32_t wordcounter : 6;
     } __attribute__((__packed__));
   };
 };
@@ -344,7 +365,7 @@ struct trdTestPattern6 {
       uint32_t rob : 3;
       uint32_t mcm : 4;
       uint32_t cpu : 2;
-      uint32_t counter : 6;
+      uint32_t wordcounter : 6;
       uint32_t oddadc : 2;
     } __attribute__((__packed__));
   };
