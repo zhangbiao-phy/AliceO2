@@ -56,7 +56,7 @@ int DigitsParser::Parse()
       }
       mState = StateDigitHCHeader; // we are the start of another link.
     }
-
+//failing here.
     if (mState == StateDigitHCHeader && (mBufferLocation == currentLinkStart + mCurrentHalfCRULinkLengths[mCurrentLink])) {
       LOG(warn) << " Parsing state is StateDigitHCHeader, yet according to the lengths we are not at the beginning of a half chamber. " << mBufferLocation << " != " << currentLinkStart << "+" << mCurrentHalfCRULinkLengths[mCurrentLink];
     }
