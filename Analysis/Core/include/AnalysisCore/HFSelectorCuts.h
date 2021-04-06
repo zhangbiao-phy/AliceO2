@@ -332,11 +332,11 @@ static const std::vector<std::string> pTBinLabels = {
 
 // column labels
 static const std::vector<std::string> cutVarLabels = {"m", "pT p", "pT K", "pT Pi", "DCA", "vertex sigma", "decay length", "cos pointing angle"};
-} // namespace hf_cuts_xic_topkpi
-};
+} // namespace hf_cuts_jpsi_toee
+}; // namespace hf_cuts_xic_topkpi
 
 // column labels
 static const std::vector<std::string> cutVarLabels = {"m", "DCA_xy", "DCA_z", "pT El"};
-} // namespace hf_cuts_jpsi_toee
+} // namespace o2::analysis
 } // namespace o2::analysis
 #endif
