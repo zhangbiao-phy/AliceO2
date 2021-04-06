@@ -20,13 +20,10 @@ namespace pdg
 enum code {
   kD0 = 421,
   kD0bar = -421,
-<<<<<<< HEAD
   kDPlus = 411,
   kLambdaCPlus = 4122,
+  kJpsi = 443,
   kXiCPlus = 4232
-=======
-  kJpsi = 443
->>>>>>> PWGHF: Use labeled array for configurable cuts in Jpsi to ee selector
 };
 }
 
