@@ -130,8 +130,14 @@ struct TaskJpsiMC {
     registry.add("hCtBg", "3-prong candidates (rec. unmatched);proper lifetime X(3872) * #it{c} (cm);entries", {HistType::kTH2F, {{400, 0., 0.001}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
     registry.add("hYSig", "3-prong candidates (rec. matched);candidate rapidity;entries", {HistType::kTH2F, {{100, -2., 2.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
     registry.add("hYBg", "3-prong candidates (rec. unmatched);candidate rapidity;entries", {HistType::kTH2F, {{100, -2., 2.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
-    registry.add("hPtGenProng0","2-prong candidates (gen. matched);prong 0 #it{p}_{T}""(GeV/#it{c});entries", {HistType::kTH2F, {{100, 0., 10.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
-    registry.add("hPtGenProng1", "2-prong candidates (gen. matched);prong 1 #it{p}_{T} ""(GeV/#it{c});entries", {HistType::kTH2F, {{100, 0., 10.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
+    registry.add("hPtGenProng0",
+                 "2-prong candidates (gen. matched);prong 0 #it{p}_{T}"
+                 "(GeV/#it{c});entries",
+                 {HistType::kTH2F, {{100, 0., 10.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
+    registry.add("hPtGenProng1",
+                 "2-prong candidates (gen. matched);prong 1 #it{p}_{T} "
+                 "(GeV/#it{c});entries",
+                 {HistType::kTH2F, {{100, 0., 10.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
     registry.add("hYGen", "2-prong candidates (gen. matched);candidate rapidity;entries", {HistType::kTH2F, {{100, -2., 2.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
   }
 
@@ -180,7 +186,6 @@ struct TaskJpsiMC {
         registry.fill(HIST("hChi2PCABg"), candidate.chi2PCA(), candidate.pt());
         registry.fill(HIST("hCtBg"), CtJpsi(candidate), candidate.pt());
         registry.fill(HIST("hYBg"), YJpsi(candidate), candidate.pt());
-
       }
     }
     // MC gen.
