@@ -130,6 +130,9 @@ struct TaskJpsiMC {
     registry.add("hCtBg", "3-prong candidates (rec. unmatched);proper lifetime X(3872) * #it{c} (cm);entries", {HistType::kTH2F, {{400, 0., 0.001}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
     registry.add("hYSig", "3-prong candidates (rec. matched);candidate rapidity;entries", {HistType::kTH2F, {{100, -2., 2.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
     registry.add("hYBg", "3-prong candidates (rec. unmatched);candidate rapidity;entries", {HistType::kTH2F, {{100, -2., 2.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
+    registry.add("hPtGenProng0","2-prong candidates (gen. matched);prong 0 #it{p}_{T}""(GeV/#it{c});entries", {HistType::kTH2F, {{100, 0., 10.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
+    registry.add("hPtGenProng1", "2-prong candidates (gen. matched);prong 1 #it{p}_{T} ""(GeV/#it{c});entries", {HistType::kTH2F, {{100, 0., 10.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}});
+    registry.add("hYGen", "2-prong candidates (gen. matched);candidate rapidity;entries", {HistType::kTH2F, {{100, -2., 2.}, {(std::vector<double>)bins, "#it{p}_{T} (GeV/#it{c})"}}}); 
   }
 
   Filter filterSelectCandidates = (aod::hf_selcandidate_jpsi::isSelJpsiToEE >= d_selectionFlagJpsi);
@@ -177,6 +180,7 @@ struct TaskJpsiMC {
         registry.fill(HIST("hChi2PCABg"), candidate.chi2PCA(), candidate.pt());
         registry.fill(HIST("hCtBg"), CtJpsi(candidate), candidate.pt());
         registry.fill(HIST("hYBg"), YJpsi(candidate), candidate.pt());
+
       }
     }
     // MC gen.
@@ -188,6 +192,16 @@ struct TaskJpsiMC {
         }
         registry.fill(HIST("hPtGen"), particle.pt());
         registry.fill(HIST("hEtaGen"), particle.eta());
+        registry.fill(HIST("hYGen"), particle.y(), particle.pt());
+
+        float ptProngs[2];
+        int counter = 0;
+        for (int iD = particle.daughter0(); iD <= particle.daughter1(); ++iD) {
+          ptProngs[counter] = particlesMC.iteratorAt(iD).pt();
+          counter++;
+        }
+        registry.fill(HIST("hPtGenProng0"), ptProngs[0], particle.pt());
+        registry.fill(HIST("hPtGenProng1"), ptProngs[1], particle.pt());
       }
     }
   }
